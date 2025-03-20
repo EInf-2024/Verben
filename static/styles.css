@@ -197,6 +197,58 @@ form {
 }
 
 
+
+
+/* Training styles */
+
+
+#gap-text-container {
+    width: 50%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+}
+
+.gap-sentence {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.gap-input {
+    width: 100px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#result-message {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+
 .hidden {
     display: none;
 }
