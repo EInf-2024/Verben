@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Franz Vocitrainer</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+    <div id="login-container">
+        <h2>Login</h2>
+        <input type="text" placeholder="Name" class="input-field">
+        <input type="password" placeholder="Password" class="input-field">
+        <button id="login-button">Log In</button>
+    </div>
+
+    <div id="main-view" class="hidden">
+        <div class="left-panel">
+            <h2>User_01</h2>
+            <div class="user-info">
+                <p id="progress-container">
+                passé composé
+                <progress id="progress-bar" value="50" max="100"></progress>
+                </p>
+                <p id="progress-container">
+                imparfait
+                <progress id="progress-bar" value="50" max="100"></progress>
+                </p>
+                <p id="progress-container">
+                futur composé
+                <progress id="progress-bar" value="50" max="100"></progress>
+                </p>
+                <p id="progress-container">
+                plus que parfait
+                <progress id="progress-bar" value="50" max="100"></progress>
+                </p>
+
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="destination-container">
+                <div class="destination">Unit 1</div>
+                <div class="destination">Unit 2</div>
+                <div class="destination">Unit 3</div>
+                <div class="destination">Unit 4</div>
+                <div class="destination">Unit 5</div>
+                <div class="destination">Unit 6</div>
+                <div class="destination">Unit 7</div>
+                <div class="destination">Unit 8</div>
+                <div class="destination">Unit 9</div>
+                <div class="destination">Unit 10</div>
+                <div class="destination">Unit 11</div>
+                <div class="destination">Unit 12</div>
+            </div>
+        </div>
+    </div>
+    <div id="tense-selection-container" class="hidden">
+
+        <section id="hero">
+            <h1>Welcome to French Tenses Training</h1>
+            <p>Enhance your French language skills with various tenses.</p>
+            <button id="home-button">Home</button>
+        </section>
+
+
+        <h2>Select French Tenses</h2>
+        <form>
+            <div class="tense">
+                <input type="checkbox" id="present" name="tense" value="present">
+                <label for="present">Présent</label>
+            </div>
+            <div class="tense">
+                <input type="checkbox" id="imparfait" name="tense" value="imparfait">
+                <label for="imparfait">Imparfait</label>
+            </div>
+            <div class="tense">
+                <input type="checkbox" id="futur" name="tense" value="futur">
+                <label for="futur">Futur Simple</label>
+            </div>
+            <div class="tense">
+                <input type="checkbox" id="passecompose" name="tense" value="passecompose">
+                <label for="passecompose">Passé Composé</label>
+            </div>
+            <div class="tense">
+                <input type="checkbox" id="subjonctif" name="tense" value="subjonctif">
+                <label for="subjonctif">Subjonctif Présent</label>
+            </div>
+            <div class="tense">
+                <input type="checkbox" id="conditionnel" name="tense" value="conditionnel">
+                <label for="conditionnel">Conditionnel Présent</label>
+            </div>
+            <div class="tense">
+                <input type="checkbox" id="plusqueparfait" name="tense" value="plusqueparfait">
+                <label for="plusqueparfait">Plus-que-parfait</label>
+            </div>
+            <div class="tense">
+                <input type="checkbox" id="futurantérieur" name="tense" value="futurantérieur">
+                <label for="futurantérieur">Futur Antérieur</label>
+            </div>
+            <div class="tense">
+                <input type="checkbox" id="passéantérieur" name="tense" value="passéantérieur">
+                <label for="passéantérieur">Passé Antérieur</label>
+            </div>
+        </form>
+
+        <div id="start-training-container">
+            <button id="start-training-button">Start Training</button>
+        </div>
+    </div>
+    <script src="../static/script.js" defer></script>
+</body>
+</html>
