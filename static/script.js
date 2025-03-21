@@ -1,39 +1,51 @@
 function toSuS() {
-    document.getElementById('login-container').classList.add('hidden');
-    document.getElementById('main-view').classList.remove('hidden');
-    document.getElementById('tense-selection-container').classList.add('hidden');
-    document.getElementById('gap-text-container').classList.add('hidden');
+    document.getElementById('navbar').classList.add('hidden');
+    document.getElementById('login-view').classList.add('hidden');
+    document.getElementById('sus-view').classList.remove('hidden');
+    document.getElementById('tense-selection-view').classList.add('hidden');
+    document.getElementById('exercise-view').classList.add('hidden');
+    document.getElementById('lp-view').classList.add('hidden');
+    document.getElementById('new-unit-view').classList.add('hidden');
 }
 
 function toTenses() {
-    document.getElementById('login-container').classList.add('hidden');
-    document.getElementById('main-view').classList.add('hidden');
-    document.getElementById('tense-selection-container').classList.remove('hidden');
-    document.getElementById('gap-text-container').classList.add('hidden');
+    document.getElementById('navbar').classList.remove('hidden');
+    document.getElementById('login-view').classList.add('hidden');
+    document.getElementById('sus-view').classList.add('hidden');
+    document.getElementById('tense-selection-view').classList.remove('hidden');
+    document.getElementById('exercise-view').classList.add('hidden');
+    document.getElementById('lp-view').classList.add('hidden');
+    document.getElementById('new-unit-view').classList.add('hidden');
 }
 
-function toTraining() {
-    document.getElementById('login-container').classList.add('hidden');
-    document.getElementById('main-view').classList.add('hidden');
-    document.getElementById('tense-selection-container').classList.add('hidden');
-    document.getElementById('gap-text-container').classList.remove('hidden');
+function toExercise() {
+    document.getElementById('navbar').classList.remove('hidden');
+    document.getElementById('login-view').classList.add('hidden');
+    document.getElementById('sus-view').classList.add('hidden');
+    document.getElementById('tense-selection-view').classList.add('hidden');
+    document.getElementById('exercise-view').classList.remove('hidden');
+    document.getElementById('lp-view').classList.add('hidden');
+    document.getElementById('new-unit-view').classList.add('hidden');
 
 }
 
 function toLP() {
-    document.getElementById('login-container').classList.add('hidden');
-    document.getElementById('main-view').classList.add('hidden');
-    document.getElementById('tense-selection-container').classList.add('hidden');
-    document.getElementById('gap-text-container').classList.add('hidden');
-    document.getElementById('LP-view').classList.remove('hidden');
+    document.getElementById('navbar').classList.add('hidden');
+    document.getElementById('login-view').classList.add('hidden');
+    document.getElementById('sus-view').classList.add('hidden');
+    document.getElementById('tense-selection-view').classList.add('hidden');
+    document.getElementById('exercise-view').classList.add('hidden');
+    document.getElementById('lp-view').classList.remove('hidden');
+    document.getElementById('new-unit-view').classList.add('hidden');
 
 }
 function toCreate() {
-    document.getElementById('login-container').classList.add('hidden');
-    document.getElementById('main-view').classList.add('hidden');
-    document.getElementById('tense-selection-container').classList.add('hidden');
-    document.getElementById('gap-text-container').classList.add('hidden');
-    document.getElementById('LP-view').classList.add('hidden');
+    document.getElementById('navbar').classList.add('hidden');
+    document.getElementById('login-view').classList.add('hidden');
+    document.getElementById('sus-view').classList.add('hidden');
+    document.getElementById('tense-selection-view').classList.add('hidden');
+    document.getElementById('exercise-view').classList.add('hidden');
+    document.getElementById('lp-view').classList.add('hidden');
     document.getElementById('new-unit-view').classList.remove('hidden');
 }
 
@@ -51,7 +63,7 @@ document.getElementById("login-button").addEventListener("click", function () {
     }
 });
 document.getElementById("home-button").addEventListener("click",toSuS);
-document.getElementById("start-training-button").addEventListener("click",toTraining);
+document.getElementById("start-training-button").addEventListener("click",toExercise);
 document.getElementById("new-unit").addEventListener("click",toCreate);
 const destinations = document.getElementsByClassName("destination");
 

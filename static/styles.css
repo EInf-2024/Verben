@@ -28,7 +28,6 @@ body {
 }
 
 .input-field {
-    width: 100%;
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;
@@ -55,16 +54,6 @@ body {
 
 /* Main View Styles */
 
-#main-view {
-    height: 100vh;
-    width: 100%;
-
-}
-#LP-view {
-    height: 100vh;
-    width: 100%;
-
-}
 
 .left-panel {
     width: 20%;

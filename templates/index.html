@@ -8,18 +8,20 @@
 </head>
 <body>
 
-    <nav class="navbar ">
+    <nav id="navbar" class="navbar hidden">
         <button id="home-button">Home</button>
+        <p>UniteName</p>
+        <button id="check-answers-button">Vérifier les réponses</button>
     </nav>
 
-    <div id="login-container">
+    <div id="login-view" class="view-container">
         <h2>Login</h2>
         <input id="input-name" type="text" placeholder="Name" class="input-field">
         <input type="password" placeholder="Password" class="input-field">
         <button id="login-button">Log In</button>
     </div>
 
-    <div id="main-view" class="hidden">
+    <div id="sus-view" class="view-container hidden">
         <div class="left-panel">
             <h2>User_01</h2>
             <div class="user-info">
@@ -60,9 +62,8 @@
             </div>
         </div>
     </div>
-    <div id="tense-selection-container" class="hidden view-container">
 
-
+    <div id="tense-selection-view" class="hidden view-container">
         <h2>Select French Tenses</h2>
         <form>
             <div class="tense">
@@ -91,7 +92,9 @@
             <button id="start-training-button">Start Training</button>
         </div>
     </div>
-    <div id="gap-text-container" class="hidden">
+
+
+    <div id="exercise-view" class="hidden">
         <h2>Complétez les phrases avec le bon verbe</h2>
 
         <div class="gap-sentence">
@@ -123,15 +126,12 @@
             <input type="text" class="gap-input" data-answer="étais">
             <span> en retard ce matin.</span>
         </div>
-
-        <button id="check-answers">Vérifier les réponses</button>
-        <p id="result-message"></p>
     </div>
 
     <! –– End of SuS possibilities ––>
 
 
-    <div id="LP-view" class="hidden">
+    <div id="lp-view" class="view-container hidden">
         <div class="LP-left1-panel">
             <h2>User_01</h2>
             <div class="user-info">
