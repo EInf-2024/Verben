@@ -34,8 +34,7 @@ function toCreate() {
     document.getElementById('tense-selection-container').classList.add('hidden');
     document.getElementById('gap-text-container').classList.add('hidden');
     document.getElementById('LP-view').classList.add('hidden');
-    document.getElementById('new-unit-view').classList.add('hidden');
-
+    document.getElementById('new-unit-view').classList.remove('hidden');
 }
 
 
