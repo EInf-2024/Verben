@@ -48,20 +48,35 @@ function toCreate() {
     document.getElementById('lp-view').classList.add('hidden');
     document.getElementById('new-unit-view').classList.remove('hidden');
 }
+/*
 
+All the functions for switching between different views.
+//
+ */
 
 
 document.getElementById("login-button").addEventListener("click", function () {
     let username = document.querySelector(".input-field[type='text']").value; // Get the input value
-
     if (username.includes("l")) {
         toLP();  // Execute toLP() if "l" is present
     } else if (username.includes("s")) {
         toSuS(); // Execute toSuS() if "s" is present
+        const name = document.getElementById("username");
+        name.innerHTML = `${username}`
+        const container = document.getElementById("sus-right");
+        for (let i = 0; i < 3; i++){
+                const unit_field = document.createElement('div');
+                unit_field.textContent = `Unit${i+1}`
+                unit_field.setAttribute("data_id", `${i+1}`)
+                unit_field.classList.add('unit-field')
+                container.appendChild(unit_field)
+            }
     } else {
         console.log("No valid character found!"); // Optional: Handle other cases
     }
 });
+
+
 document.getElementById("home-button").addEventListener("click",toSuS);
 document.getElementById("start-training-button").addEventListener("click",toExercise);
 document.getElementById("new-unit").addEventListener("click",toCreate);

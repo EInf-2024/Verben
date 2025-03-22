@@ -74,7 +74,7 @@ body {
     grid-template-rows: repeat(3, 1fr);
     gap: 10px;
 }
-.destination {
+.unit-field {
     background-color: #007BFF;
     color: white;
     padding: 100px 15px;
@@ -82,7 +82,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
-.destination:hover {
+.unit-field:hover {
     background-color: #0056b3;
 }
 
