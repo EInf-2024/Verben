@@ -64,7 +64,7 @@ document.getElementById("login-button").addEventListener("click", function () {
         const name = document.getElementById("username");
         name.innerHTML = `${username}`
         const container = document.getElementById("sus-right");
-        for (let i = 0; i < 3; i++){
+        for (let i = 0; i < 10; i++){
                 const unit_field = document.createElement('div');
                 unit_field.textContent = `Unit${i+1}`
                 unit_field.setAttribute("data_id", `${i+1}`)
@@ -76,9 +76,30 @@ document.getElementById("login-button").addEventListener("click", function () {
     }
 });
 
+document.getElementById("sus-right").addEventListener("click",function (event) {
+    if (event.target.tagName === "DIV") {
+        const objectId = event.target.getAttribute("data_id");
+        toTenses()
+        document.getElementById('nav-unit-name').textContent = `Unit${objectId}`
+    }
+});
+
+
+
+document.getElementById("start-training-button").addEventListener("click",function (){
+    for (let i = 0; i < 5; i++){
+        // Create the main div
+    const sentence = document.createElement('div');
+    sentence.classList.add('gap-sentence');
+    sentence.innerHTML = 'Tu <input type="text" class="gap-input" data-answer="étais"> en retard ce matin.';
+    document.getElementById('exercise-view').appendChild(sentence);
+    toExercise()
+
+    }
+
+});
 
 document.getElementById("home-button").addEventListener("click",toSuS);
-document.getElementById("start-training-button").addEventListener("click",toExercise);
 document.getElementById("new-unit").addEventListener("click",toCreate);
 const destinations = document.getElementsByClassName("destination");
 
