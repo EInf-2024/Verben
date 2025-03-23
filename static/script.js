@@ -87,6 +87,7 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
 
 
 document.getElementById("start-training-button").addEventListener("click",function (){
+    document.getElementById('exercise-view').innerHTML = ``
     for (let i = 0; i < 5; i++){
         // Create the main div
     const sentence = document.createElement('div');
@@ -98,6 +99,30 @@ document.getElementById("start-training-button").addEventListener("click",functi
     }
 
 });
+
+document.getElementById("check-answers-button").addEventListener("click",function (){
+    const sentences = document.querySelectorAll('.gap-sentence');
+    sentences.forEach(sentence => {
+        const input = sentence.querySelector('.gap-input');
+        const correctAnswer = input.getAttribute('data-answer');
+        if (input.value === correctAnswer) {
+            sentence.querySelector('.gap-input').classList.add('green-text')
+        }
+        else{
+            sentence.querySelector('.gap-input').classList.add('red-text');
+        }
+        console.log(input.value === correctAnswer);
+    });
+
+
+
+});
+
+
+
+
+
+
 
 document.getElementById("home-button").addEventListener("click",toSuS);
 document.getElementById("new-unit").addEventListener("click",toCreate);
