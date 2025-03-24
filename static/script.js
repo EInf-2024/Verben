@@ -104,46 +104,34 @@ function susView (){
 
 
 document.getElementById("login-button").addEventListener("click",login)
-    /*
-    function () {
-    let username = document.querySelector(".input-field[type='text']").value; // Get the input value
-    if (username.includes("l")) {
-        toLP();  // Execute toLP() if "l" is present
-    } else if (username.includes("s")) {
-        toSuS(); // Execute toSuS() if "s" is present
-        const name = document.getElementById("username");
-        name.innerHTML = `${username}`
-        const container = document.getElementById("sus-right");
-        for (let i = 0; i < 10; i++){
-                const unit_field = document.createElement('div');
-                unit_field.textContent = `Unit${i+1}`
-                unit_field.setAttribute("data_id", `${i+1}`)
-                unit_field.classList.add('unit-field')
-                container.appendChild(unit_field)
-            }
-    } else {
-        console.log("No valid character found!"); // Optional: Handle other cases
-    }
-});
-*/
-
-
-
-
-
-
-
-
-
-
-
-
 
 document.getElementById("sus-right").addEventListener("click",function (event) {
     if (event.target.tagName === "DIV") {
         const objectId = event.target.getAttribute("data_id");
+        const objectName = event.target.textContent
+        document.getElementById('nav-unit-name').textContent = `${objectName}`
+        document.getElementById('tense-form').innerHTML=``
+
+
+        fetch(`http://127.0.0.1:5000/tenses?token=${encodeURIComponent(token)}&unit=${encodeURIComponent(objectId)}`)
+            .then(response => response.json())
+            .then(data => {
+                for (const tense in data) {
+                    if(data[tense]){
+                        const tenseDiv = document.createElement('div');
+                        tenseDiv.classList.add('tense');
+                        tenseDiv.innerHTML = `<input type="checkbox" name="tense" value="${tense}"><label for="${tense}"></label>`;
+                        tenseDiv.querySelector('label').textContent = tense;
+                        document.getElementById("tense-form").appendChild(tenseDiv)
+
+                    }
+                }
+
+
+
+            })
+
         toTenses()
-        document.getElementById('nav-unit-name').textContent = `Unit${objectId}`
     }
 });
 
