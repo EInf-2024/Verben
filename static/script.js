@@ -1,3 +1,5 @@
+let token = 0
+
 function toSuS() {
     document.getElementById('navbar').classList.add('hidden');
     document.getElementById('login-view').classList.add('hidden');
@@ -54,8 +56,56 @@ All the functions for switching between different views.
 //
  */
 
+function login (){
+    const username = document.getElementById('input-name').value
+    const password = document.getElementById('input-password').value
+    fetch(`http://127.0.0.1:5000/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`)
+        .then(response => response.json())
+        .then(data => {
+            token = data.token
+            if (data.role === 'S'){
+                susView()
+            }
+        })
+        .catch(error => console.error('Fehler', error))
+}
 
-document.getElementById("login-button").addEventListener("click", function () {
+function susView (){
+    toSuS()
+    fetch(`http://127.0.0.1:5000/susView?token=${encodeURIComponent(token)}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("username").innerHTML = `${data.username}`
+            for (const tense in data.progress) {
+                if (parseFloat(data.progress[tense]) != 0) {
+                    const progressContainer = document.createElement('p');
+                    progressContainer.id = 'progress-container';
+                    if (data.progress.hasOwnProperty(tense)) {
+                        progressContainer.innerHTML = `
+                            ${tense} <progress id="progress-bar" value="${data.progress[tense]}" max="1"></progress>
+                        `;
+                    }
+                    document.getElementById('user-info').appendChild(progressContainer);
+                }
+            }
+            const container = document.getElementById("sus-right");
+            for (const unit in data.units) {
+                const unit_field = document.createElement('div');
+                unit_field.textContent = `${data.units[unit]}`
+                unit_field.setAttribute("data_id", `${unit}`)
+                unit_field.classList.add('unit-field')
+                container.appendChild(unit_field)
+            }
+
+        })
+        .catch(error => console.error('Fehler', error))
+}
+
+
+
+document.getElementById("login-button").addEventListener("click",login)
+    /*
+    function () {
     let username = document.querySelector(".input-field[type='text']").value; // Get the input value
     if (username.includes("l")) {
         toLP();  // Execute toLP() if "l" is present
@@ -75,6 +125,19 @@ document.getElementById("login-button").addEventListener("click", function () {
         console.log("No valid character found!"); // Optional: Handle other cases
     }
 });
+*/
+
+
+
+
+
+
+
+
+
+
+
+
 
 document.getElementById("sus-right").addEventListener("click",function (event) {
     if (event.target.tagName === "DIV") {
