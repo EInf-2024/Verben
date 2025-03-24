@@ -18,6 +18,7 @@ function toTenses() {
     document.getElementById('exercise-view').classList.add('hidden');
     document.getElementById('lp-view').classList.add('hidden');
     document.getElementById('new-unit-view').classList.add('hidden');
+    document.getElementById('check-answers-button').classList.add('hidden')
 }
 
 function toExercise() {
@@ -28,6 +29,7 @@ function toExercise() {
     document.getElementById('exercise-view').classList.remove('hidden');
     document.getElementById('lp-view').classList.add('hidden');
     document.getElementById('new-unit-view').classList.add('hidden');
+    document.getElementById('check-answers-button').classList.remove('hidden')
 
 }
 
@@ -56,6 +58,7 @@ All the functions for switching between different views.
 //
  */
 
+document.getElementById("login-button").addEventListener("click",login)
 function login (){
     const username = document.getElementById('input-name').value
     const password = document.getElementById('input-password').value
@@ -101,19 +104,15 @@ function susView (){
         .catch(error => console.error('Fehler', error))
 }
 
-
-
-document.getElementById("login-button").addEventListener("click",login)
-
 document.getElementById("sus-right").addEventListener("click",function (event) {
     if (event.target.tagName === "DIV") {
         const objectId = event.target.getAttribute("data_id");
         const objectName = event.target.textContent
-        document.getElementById('nav-unit-name').textContent = `${objectName}`
-        document.getElementById('tense-form').innerHTML=``
+        const navbar = document.getElementById('nav-unit-name')
+        navbar.textContent = `${objectName}`
+        document.getElementById('navbar').setAttribute("selected_unit",`${objectId}`)
 
-
-        fetch(`http://127.0.0.1:5000/tenses?token=${encodeURIComponent(token)}&unit=${encodeURIComponent(objectId)}`)
+        fetch(`http://127.0.0.1:5000/tenses?token=${encodeURIComponent(token)}`)
             .then(response => response.json())
             .then(data => {
                 for (const tense in data) {
@@ -126,9 +125,6 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
 
                     }
                 }
-
-
-
             })
 
         toTenses()
@@ -138,14 +134,24 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
 
 
 document.getElementById("start-training-button").addEventListener("click",function (){
+    toExercise()
+    const selectedTenses = [...document.querySelectorAll('input[name="tense"]:checked')]
+        .map(checkbox => checkbox.value);
+    console.log(selectedTenses); // Prints selected tenses
+    const selected_unit = document.getElementById('navbar').getAttribute('selected_unit')
+
+    fetch(`http://127.0.0.1:5000/training?token=${encodeURIComponent(token)}&tenses=${encodeURIComponent(selectedTenses)}&unit=${encodeURIComponent(selected_unit)}`)
+            .then(response => response.json())
+            .then(data => {})
     document.getElementById('exercise-view').innerHTML = ``
+
     for (let i = 0; i < 5; i++){
         // Create the main div
     const sentence = document.createElement('div');
     sentence.classList.add('gap-sentence');
     sentence.innerHTML = 'Tu <input type="text" class="gap-input" data-answer="étais"> en retard ce matin.';
     document.getElementById('exercise-view').appendChild(sentence);
-    toExercise()
+
 
     }
 

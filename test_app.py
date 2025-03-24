@@ -7,11 +7,14 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+
 @app.route('/login', methods=['GET'])
 def login():
     username = request.args.get('username')
     password = request.args.get('password')
     return jsonify({"role": "S", "token": 1})
+
+
 
 @app.route('/susView', methods=['GET'])
 def toSuS():
@@ -26,15 +29,25 @@ def toSuS():
             }}
         return jsonify(result)
 
+
+
 @app.route('/tenses', methods=['GET'])
 def tenses():
     token = request.args.get('token')
-    unit = request.args.get('unit')
-    print(unit)
     if token == '1':
         result = {"présent":True,"passé":False,"futur":True,"passé composé":True}
         return jsonify(result)
 
+
+
+@app.route('/training', methods=['GET'])
+def training():
+    token = request.args.get('token')
+    selected_tenses = request.args.get('tenses')
+    unit = request.args.get('unit')
+    if token == '1':
+        result = {"présent":True,"passé":False,"futur":True,"passé composé":True}
+        return jsonify(result)
 
 
 
