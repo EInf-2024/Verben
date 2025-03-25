@@ -12,7 +12,7 @@ def index():
 def login():
     username = request.args.get('username')
     password = request.args.get('password')
-    return jsonify({"role": "S", "token": 1})
+    return jsonify({"role": str(username), "token": 1})
 
 
 

@@ -376,6 +376,103 @@ button:hover {
 
 
 
+
+
+
+
+
+
+
+
+.new-unit-view{
+    display: flex;
+    justify-content: space-between;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 800px;
+    margin: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.task-editor {
+    width: 55%;
+    border-right: 2px solid #ccc;
+    padding-right: 20px;
+}
+
+.task-editor h2 {
+    margin-top: 0;
+}
+
+.verb-list {
+    list-style: none;
+    padding: 0;
+}
+
+.verb-list li {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.input-section {
+    width: 40%;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+textarea {
+    height: 60px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.add-btn, .upload-btn {
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    background: #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.create-btn, .delete-btn {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.create-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.delete-btn {
+    background: #f44336;
+    color: white;
+}
+
+
 .hidden {
     display: none;
 }

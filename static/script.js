@@ -51,6 +51,7 @@ function toCreate() {
     document.getElementById('exercise-view').classList.add('hidden');
     document.getElementById('lp-view').classList.add('hidden');
     document.getElementById('new-unit-view').classList.remove('hidden');
+    console.log('new Unit')
 }
 /*
 
@@ -66,8 +67,11 @@ function login (){
         .then(response => response.json())
         .then(data => {
             token = data.token
-            if (data.role === 'S'){
+            if (data.role === 's'){
                 susView()
+            }
+            if (data.role === 'l'){
+                toLP()
             }
         })
         .catch(error => console.error('Fehler', error))

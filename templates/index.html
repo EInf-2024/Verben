@@ -114,47 +114,50 @@
         </div>
     </div>
 
-    <div id="new-unit-view" class="hidden">
-        <div class="ls">
-        <input type="text" placeholder="Unit Name">
-        <textarea placeholder="Enter text here"></textarea>
 
-        <div class="button-group">
-            <button>+</button>
-            <button>Upload</button>
+    <div id="new-unit-view" class="new-unit-view hidden">
+        <div class="task-editor">
+            <h2>Aufgaben Bearbeiten</h2>
+            <ul class="verb-list">
+                <li>✖ Manger</li>
+                <li>✖ Parler</li>
+                <li>✖ Aimer</li>
+                <li>✖ Marcher</li>
+                <li>✖ Jouer</li>
+                <li>✖ Travailler</li>
+                <li>✖ Étudier</li>
+                <li>✖ Regarder</li>
+                <li>✖ Écouter</li>
+                <li>✖ Chanter</li>
+                <li>✖ Dormir</li>
+                <li>✖ Finir</li>
+                <li>✖ Vivre</li>
+                <li>✖ Aller</li>
+                <li>✖ Venir</li>
+                <li>✖ Lire</li>
+                <li>✖ Écrire</li>
+                <li>✖ Comprendre</li>
+                <li>✖ Savoir</li>
+                <li>•</li>
+                <li>•</li>
+                <li>•</li>
+            </ul>
         </div>
-
-        <select>
-            <option>Choose department</option>
-            <option>HR</option>
-            <option>Finance</option>
-            <option>IT</option>
-        </select>
-
-        <div class="button-group">
-            <button>Create</button>
-            <button>Delete</button>
+        <div class="input-section">
+            <input type="text" placeholder="Name">
+            <textarea placeholder=""></textarea>
+            <div class="button-group">
+                <button class="add-btn">+</button>
+                <button class="upload-btn">⬆</button>
+            </div>
+            <select>
+                <option>Klassen</option>
+            </select>
+            <div class="action-buttons">
+                <button class="create-btn">Erstellen</button>
+                <button class="delete-btn">Löschen</button>
+            </div>
         </div>
-    </div>
-
-    <div class="rs">
-        <div class="verb-list">
-            <div class="verb-item">
-                <span>Run</span>
-                <button>X</button>
-            </div>
-            <div class="verb-item">
-                <span>Jump</span>
-                <button>X</button>
-            </div>
-            <div class="verb-item">
-                <span>Swim</span>
-                <button>X</button>
-            </div>
-            <!-- More verbs can be added here -->
-        </div>
-    </div>
-
     </div>
     <script src="../static/script.js" defer></script>
 </body>
