@@ -196,13 +196,25 @@ document.getElementById("check-answers-button").addEventListener("click",functio
 
     });
 
-    fetch("http://127.0.0.1:5000/verify", {
+    if(
+        button_clicks === "0"
+    ){
+        fetch("http://127.0.0.1:5000/verify", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
     },
     body: JSON.stringify({ score: score }) // Send the entire object
     })
+    .then(response => {
+    if (!response.ok) {
+        console.error("Error:", response.statusText);
+    } else {
+        console.log("Score sent successfully");
+    }
+    })
+    .catch(error => console.error("Fetch error:", error));
+    }
 
 
     document.getElementById("check-answers-button").setAttribute("clicked",1)
@@ -214,7 +226,10 @@ document.getElementById("check-answers-button").addEventListener("click",functio
 
 
 
-document.getElementById("home-button").addEventListener("click",toSuS);
+document.getElementById("home-button").addEventListener("click",susView);
+
+
+
 document.getElementById("new-unit").addEventListener("click",toCreate);
 const destinations = document.getElementsByClassName("destination");
 

@@ -57,22 +57,11 @@ def training():
 
 @app.route('/verify', methods=['POST'])
 def verify():
-    token = request.args.get('token')
-    present = request.args.get('present')
-    past = request.args.get('passe_composee')
-    future = request.args.get('future_simple')
-    imperfect = request.args.get('imperfect')
-    ppc = request.args.get('plus_que_parfait')
-    if token == '1':
-        print(present)
-        print(past)
-        print(future)
-        print(imperfect)
-        print(ppc)
-
-
-
-
+    data = request.get_json()  # Get JSON data
+    score = data.get("score")  # Extract "score" object
+    print("Received Score:", score)  # Debugging
+    print(score["Imparfait"])
+    return '', 204  # 204 No Content (no response needed)
 
 
 
