@@ -79,6 +79,7 @@ function susView (){
         .then(response => response.json())
         .then(data => {
             document.getElementById("username").innerHTML = `${data.username}`
+            document.getElementById('user-info').innerHTML = ``
             for (const tense in data.progress) {
                 if (parseFloat(data.progress[tense]) != 0) {
                     const progressContainer = document.createElement('p');
@@ -92,6 +93,7 @@ function susView (){
                 }
             }
             const container = document.getElementById("sus-right");
+            container.innerHTML=``
             for (const unit in data.units) {
                 const unit_field = document.createElement('div');
                 unit_field.textContent = `${data.units[unit]}`
@@ -192,6 +194,11 @@ document.getElementById("check-answers-button").addEventListener("click",functio
                 const tense = input.getAttribute('data-tense')
                 score[tense][1] += 1
             }
+        }
+        if(button_clicks === "1"){
+            const p = document.createElement("p");
+            p.textContent = `${correctAnswer}`;
+            sentence.appendChild(p);
         }
 
     });
