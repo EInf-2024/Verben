@@ -46,8 +46,30 @@ def training():
     selected_tenses = request.args.get('tenses')
     unit = request.args.get('unit')
     if token == '1':
-        result = {"présent":True,"passé":False,"futur":True,"passé composé":True}
+        result = [{'start':'Quand j’étais petit, je','infinitive':'jouer','solution':'jouais','tense':'Imparfait','end':'au foot tous les jours.'},
+                  {'start':'Demain, nous','infinitive':'partir','solution':'partirons','tense':'Futur simple','end':' en vacances à la mer.'},
+                  {'start':'Chaque été, nous ','infinitive':'aller','solution':' allions','tense':'Imparfait','end':'à la plage avec ma famille.'},
+                  {'start':'Hier, ils','infinitive':'voir','solution':'ont vu','tense':'Passe compose','end':'un film très intéressant.'},
+                  {'start':'Si j’avais su, je','infinitive':'ne pas venir','solution':'ne serais pas venu','tense':'Plus-que-parfait','end':'à la fête'}]
         return jsonify(result)
+
+
+
+@app.route('/verify', methods=['POST'])
+def verify():
+    token = request.args.get('token')
+    present = request.args.get('present')
+    past = request.args.get('passe_composee')
+    future = request.args.get('future_simple')
+    imperfect = request.args.get('imperfect')
+    ppc = request.args.get('plus_que_parfait')
+    if token == '1':
+        print(present)
+        print(past)
+        print(future)
+        print(imperfect)
+        print(ppc)
+
 
 
 
