@@ -2,7 +2,7 @@ let token = 0
 
 function toSuS() {
     document.getElementById('navbar').classList.add('hidden');
-    document.getElementById('login-view').classList.add('hidden');
+    document.getElementById('login-view').classList.add('d-none');
     document.getElementById('sus-view').classList.remove('hidden');
     document.getElementById('tense-selection-view').classList.add('hidden');
     document.getElementById('exercise-view').classList.add('hidden');

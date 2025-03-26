@@ -16,7 +16,7 @@ def login():
 
 
 
-@app.route('/susView', methods=['GET'])
+@app.route('/susview', methods=['GET'])  # ändern in JS
 def toSuS():
     token = request.args.get('token')
     if token == '1':
@@ -62,6 +62,58 @@ def verify():
     print("Received Score:", score)  # Debugging
     print(score["Imparfait"])
     return '', 204  # 204 No Content (no response needed)
+
+
+@app.route('/lpview', methods=['GET'])
+def toLP():
+    token = request.args.get('token')
+    if token == '1':
+        result = {
+            'username': 'Mrs. ',
+            'classes': {'1': 'G1A', '2': 'G1B', '3': 'G4H'},
+            'units': {
+                '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
+                '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'}
+        }
+        return jsonify(result)
+
+
+@app.route('/lpclass', methods=['GET'])
+def toLP():
+    token = request.args.get('token')
+    class_id = request.args.get('class_id')
+    if token == '1':
+        result = {
+            'sus_names': {'1': 'Alice', '2': 'Bob', '3': 'Eve'},
+            'units': {
+                '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
+                '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'}
+        }
+        return jsonify(result)
+
+# ????
+
+@app.route('/lpedit', methods=['GET'])
+def toLP():
+    token = request.args.get('token')
+    unit_id = request.args.get('class_id')
+    if token == '1':
+        result = {
+            'sus_namesx': {'1': 'Alice', '2': 'Bob', '3': 'Eve'},
+            'units': {
+                '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
+                '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'}
+        }
+        return jsonify(result)
+
+
+
+
+
+
+
+
+
 
 
 
