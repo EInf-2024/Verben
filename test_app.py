@@ -22,7 +22,7 @@ def toSuS():
     if token == '1':
         result = {
             'username': 'Rudolf',
-            'progress': {'past': 0.1, 'future': 0.0, 'present': 1,'passé composé':.75},
+            'progress': {'Présent': 0.1, 'Passé composé': 0.0, 'Imparfait': 1,'Plus-que-parfait':.75},
             'units': {
                 '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
                 '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'
@@ -35,7 +35,18 @@ def toSuS():
 def tenses():
     token = request.args.get('token')
     if token == '1':
-        result = {"présent":True,"passé":False,"futur":True,"passé composé":True}
+        result = {
+            "Présent": False,
+            "Passé composé": False,
+            "Imparfait": False,
+            "Plus-que-parfait": True,
+            "Futur simple": True,
+            "Conditionnel présent": True,
+            "Conditionnel passé": True,
+            "Subjonctif présent": True,
+            "Subjonctif passé": True,
+            "Impératif": True
+        }
         return jsonify(result)
 
 
@@ -49,7 +60,7 @@ def training():
         result = [{'start':'Quand j’étais petit, je','infinitive':'jouer','solution':'jouais','tense':'Imparfait','end':'au foot tous les jours.'},
                   {'start':'Demain, nous','infinitive':'partir','solution':'partirons','tense':'Futur simple','end':' en vacances à la mer.'},
                   {'start':'Chaque été, nous ','infinitive':'aller','solution':' allions','tense':'Imparfait','end':'à la plage avec ma famille.'},
-                  {'start':'Hier, ils','infinitive':'voir','solution':'ont vu','tense':'Passe compose','end':'un film très intéressant.'},
+                  {'start':'Hier, ils','infinitive':'voir','solution':'ont vu','tense':'Passé composé','end':'un film très intéressant.'},
                   {'start':'Si j’avais su, je','infinitive':'ne pas venir','solution':'ne serais pas venu','tense':'Plus-que-parfait','end':'à la fête'}]
         return jsonify(result)
 
@@ -79,7 +90,7 @@ def toLP():
 
 
 @app.route('/lpclass', methods=['GET'])
-def toLP():
+def lpclass():
     token = request.args.get('token')
     class_id = request.args.get('class_id')
     if token == '1':
@@ -94,7 +105,7 @@ def toLP():
 # ????
 
 @app.route('/lpedit', methods=['GET'])
-def toLP():
+def toedit():
     token = request.args.get('token')
     unit_id = request.args.get('class_id')
     if token == '1':

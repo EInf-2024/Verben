@@ -9,11 +9,12 @@
 
 </head>
 <body>
-    <header id="navbar" class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom hidden fixed-top w-100 bg-white">
+    <header id="navbar" class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom d-none fixed-top w-100 bg-white">
         <div class="container-fluid">
             <button id="home-button" class="btn btn-light">Home</button>
             <p id="nav-unit-name" class="m-0 text-white fw-bold">Unité Name</p>
             <button id="check-answers-button" class="btn btn-light">Vérifier les réponses</button>
+            <p id="percentage" ></p>
         </div>
     </header>
 
@@ -57,9 +58,9 @@
     <! –– End of SuS possibilities ––>
 
 
-    <div id="lp-view" class="view-container hidden">
+    <div id="lp-view" class="view-container hidden h2">
         <div class="LP-left1-panel">
-            <h2>User_01</h2>
+            <button class="btn btn-primary w-100 justify-content-center ">User_01</button>
             <div class="user-info">
                 <p id="progress-container">G4J</p>
                 <p id="progress-container">G2D</p>
@@ -80,9 +81,7 @@
                 <p id="progress-container">G2D</p>
             </div>
         </div>
-        <button id="new-unit">+</button>
         <div class="LP-left2-panel">
-            <h2>User_01</h2>
             <div class="user-info">
                 <p id="progress-container">Alice</p>
                 <p id="progress-container">Bob</p>
@@ -100,22 +99,23 @@
                 <p id="progress-container">Eve</p>
                 <p id="progress-container">Eve</p>
             </div>
+            <button id="new-unit">new Unit</button>
         </div>
 
         <div class="LP-left3-panel">
-            <div class="destination-container">
-                <div class="destination">Unit 1</div>
-                <div class="destination">Unit 2</div>
-                <div class="destination">Unit 3</div>
-                <div class="destination">Unit 4</div>
-                <div class="destination">Unit 5</div>
-                <div class="destination">Unit 6</div>
-                <div class="destination">Unit 7</div>
-                <div class="destination">Unit 8</div>
-                <div class="destination">Unit 9</div>
-                <div class="destination">Unit 10</div>
-                <div class="destination">Unit 11</div>
-                <div class="destination">Unit 12</div>
+            <div class="unit-field-container">
+                <div class="unit-field">Unit 1</div>
+                <div class="unit-field">Unit 2</div>
+                <div class="unit-field">Unit 3</div>
+                <div class="unit-field">Unit 4</div>
+                <div class="unit-field">Unit 5</div>
+                <div class="unit-field">Unit 6</div>
+                <div class="unit-field">Unit 7</div>
+                <div class="unit-field">Unit 8</div>
+                <div class="unit-field">Unit 9</div>
+                <div class="unit-field">Unit 10</div>
+                <div class="unit-field">Unit 11</div>
+                <div class="unit-field">Unit 12</div>
             </div>
         </div>
     </div>

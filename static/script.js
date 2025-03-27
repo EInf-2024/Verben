@@ -1,7 +1,7 @@
 let token = 0
 
 function toSuS() {
-    document.getElementById('navbar').classList.add('hidden');
+    document.getElementById('navbar').classList.add('d-none');
     document.getElementById('login-view').classList.add('d-none');
     document.getElementById('sus-view').classList.remove('hidden');
     document.getElementById('tense-selection-view').classList.add('hidden');
@@ -11,7 +11,7 @@ function toSuS() {
 }
 
 function toTenses() {
-    document.getElementById('navbar').classList.remove('hidden');
+    document.getElementById('navbar').classList.remove('d-none');
     document.getElementById('login-view').classList.add('hidden');
     document.getElementById('sus-view').classList.add('hidden');
     document.getElementById('tense-selection-view').classList.remove('hidden');
@@ -35,7 +35,7 @@ function toExercise() {
 
 function toLP() {
     document.getElementById('navbar').classList.add('hidden');
-    document.getElementById('login-view').classList.add('hidden');
+    document.getElementById('login-view').classList.add('d-none');
     document.getElementById('sus-view').classList.add('hidden');
     document.getElementById('tense-selection-view').classList.add('hidden');
     document.getElementById('exercise-view').classList.add('hidden');
@@ -79,7 +79,8 @@ function login (){
 
 function susView (){
     toSuS()
-    fetch(`http://127.0.0.1:5000/susView?token=${encodeURIComponent(token)}`)
+    document.getElementById('percentage').innerHTML=''
+    fetch(`http://127.0.0.1:5000/susview?token=${encodeURIComponent(token)}`)
         .then(response => response.json())
         .then(data => {
             document.getElementById("username").innerHTML = `${data.username}`
@@ -144,7 +145,6 @@ document.getElementById("start-training-button").addEventListener("click",functi
     const selectedTenses = [...document.querySelectorAll('input[name="tense"]:checked')]
         .map(checkbox => checkbox.value);
     const selected_unit = document.getElementById('navbar').getAttribute('selected_unit')
-
     fetch(`http://127.0.0.1:5000/training?token=${encodeURIComponent(token)}&tenses=${encodeURIComponent(selectedTenses.join(','))}&unit=${encodeURIComponent(selected_unit)}`)
             .then(response => response.json())
             .then(data => {
@@ -166,12 +166,18 @@ document.getElementById("start-training-button").addEventListener("click",functi
 document.getElementById("check-answers-button").addEventListener("click",function (){
 
     let score = {
-        "Present":[0,0],
-        "Futur simple":[0,0],
-        "Imparfait":[0,0],
-        "Passe compose":[0,0],
-        "Plus-que-parfait":[0,0]
-    }
+    "Présent": [0, 0],
+    "Passé composé": [0, 0],
+    "Imparfait": [0, 0],
+    "Plus-que-parfait": [0, 0],
+    "Futur simple": [0, 0],
+    "Conditionnel présent": [0, 0],
+    "Conditionnel passé": [0, 0],
+    "Subjonctif présent": [0, 0],
+    "Subjonctif passé": [0, 0],
+    "Impératif": [0, 0]
+    };
+    let cur_score = [0,0]
     const button_clicks = document.getElementById("check-answers-button").getAttribute("clicked")
     if (parseInt(button_clicks) === 1){
         document.getElementById("check-answers-button").classList.add("hidden")
@@ -187,6 +193,7 @@ document.getElementById("check-answers-button").addEventListener("click",functio
                 const tense = input.getAttribute('data-tense')
                 score[tense][1] += 1
                 score[tense][0] += 1
+                cur_score[0] += 1
             }
             // if it is the first, check the answers
             // if it is the second,add the solution at the end of the sentence.
@@ -199,6 +206,7 @@ document.getElementById("check-answers-button").addEventListener("click",functio
                 score[tense][1] += 1
             }
         }
+        cur_score[1] += 1
         if(button_clicks === "1"){
             const p = document.createElement("p");
             p.textContent = `${correctAnswer}`;
@@ -226,15 +234,11 @@ document.getElementById("check-answers-button").addEventListener("click",functio
     })
     .catch(error => console.error("Fetch error:", error));
     }
-
+    const cp = cur_score[0] / cur_score[1]
+    document.getElementById('percentage').innerHTML = `${cp *100}%`
 
     document.getElementById("check-answers-button").setAttribute("clicked",1)
 });
-
-
-
-
-
 
 
 document.getElementById("home-button").addEventListener("click",susView);
