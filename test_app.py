@@ -80,7 +80,7 @@ def toLP():
     token = request.args.get('token')
     if token == '1':
         result = {
-            'username': 'Mrs. ',
+            'username': 'Mrs.French ',
             'classes': {'1': 'G1A', '2': 'G1B', '3': 'G4H'},
             'units': {
                 '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',

@@ -71,10 +71,28 @@ function login (){
                 susView()
             }
             if (data.role === 'l'){
-                toLP()
+                lpView()
             }
         })
         .catch(error => console.error('Fehler', error))
+}
+
+function lpView(){
+    toLP()
+    document.getElementById('all-students').classList.add('d-none')
+    fetch(`http://127.0.0.1:5000/lpview?token=${encodeURIComponent(token)}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('lp-user-btn').textContent = data.username
+            document.getElementById('lp-classes').innerHTML = ``
+            for (const cl in data.classes) {
+                const grade = document.createElement('p');
+                grade.innerHTML = `${data.classes[cl]}`
+                grade.setAttribute("data_id", `${cl}`)
+                document.getElementById('lp-classes').appendChild(grade)
+
+            }
+        });
 }
 
 function susView (){
