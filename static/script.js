@@ -77,20 +77,28 @@ function login (){
         .catch(error => console.error('Fehler', error))
 }
 
+document.getElementById('lp-user-btn').addEventListener("click",lpView)
+
 function lpView(){
     toLP()
-    document.getElementById('all-students').classList.add('d-none')
+    document.getElementById('lp-students').classList.add('d-none')
     fetch(`http://127.0.0.1:5000/lpview?token=${encodeURIComponent(token)}`)
         .then(response => response.json())
         .then(data => {
             document.getElementById('lp-user-btn').textContent = data.username
             document.getElementById('lp-classes').innerHTML = ``
-            document.getElementById('lp-classes').innerHTML=``
+            document.getElementById('class-selection').innerHTML=``
             for (const cl in data.classes) {
                 const grade = document.createElement('p');
+                const grade_option = document.createElement('option')
                 grade.innerHTML = `${data.classes[cl]}`
+                grade_option.innerHTML = `${data.classes[cl]}`
                 grade.setAttribute("data_id", `${cl}`)
+                grade_option.setAttribute("data_id", `${cl}`)
                 document.getElementById('lp-classes').appendChild(grade)
+                document.getElementById('class-selection').appendChild(grade_option)
+
+
             }
             document.getElementById('lp-units').innerHTML=``
             for (const unit in data.units) {
@@ -107,9 +115,7 @@ document.getElementById("lp-classes").addEventListener("click",function (event) 
     if (event.target.tagName === "P") {
         const classId = event.target.getAttribute("data_id");
         const objectName = event.target.textContent
-        console.log(classId)
-        console.log(objectName)
-
+        document.getElementById('lp-students').classList.remove('d-none')
         fetch(`http://127.0.0.1:5000/lpclass?token=${encodeURIComponent(token)}&class_id=${encodeURIComponent(classId)}`)
             .then(response => response.json())
             .then(data => {
@@ -121,15 +127,80 @@ document.getElementById("lp-classes").addEventListener("click",function (event) 
                 unit_field.setAttribute("data_id", `${unit}`)
                 document.getElementById('lp-units').appendChild(unit_field)
             }
+                document.getElementById('lp-students').innerHTML=``
                 for (const student in data.sus_names) {
-                const student_field = document.createElement('p');
-                student_field.innerHTML = `${data.classes[cl]}`
-                student_field.setAttribute("data_id", `${cl}`)
-                document.getElementById('lp-classes').appendChild(grade)
-            }
+                    const student_field = document.createElement('p');
+                    student_field.innerHTML = `${data.sus_names[student]}`
+                    student_field.setAttribute("data_id", `${student}`)
+                    document.getElementById('lp-students').appendChild(student_field)
+
+                }
             })
     }
 });
+
+
+
+document.getElementById("lp-students").addEventListener("click",function (event) {
+    if (event.target.tagName === "P") {
+        const studentId = event.target.getAttribute("data_id");
+        document.getElementById('lp-students').classList.remove('d-none')
+        fetch(`http://127.0.0.1:5000/susview?token=${encodeURIComponent(studentId)}`)
+            .then(response => response.json())
+            .then(data => {
+                const lpInfoContainer = document.getElementById('lp-units');
+                lpInfoContainer.innerHTML = `${data.username}`
+                for (const tense in data.progress) {
+                    const progressContainer = document.createElement('p');
+                    progressContainer.id = 'progress-container';
+                    if (data.progress.hasOwnProperty(tense)) {
+                        progressContainer.innerHTML = `
+                        ${tense} <progress id="progress-bar" value="${data.progress[tense]}" max="1"></progress>`;
+                    }
+                    lpInfoContainer.appendChild(progressContainer);
+                }
+            })
+    }
+});
+
+
+document.getElementById("new-unit").addEventListener("click",function(){
+    document.getElementById('verb-list').innerHTML= ``
+    document.getElementById('unit-name').value= ``
+    document.getElementById('verb-input').value= ``
+    document.getElementById('save-btn').classList.add('d-none')
+    document.getElementById('delete-btn').classList.add('d-none')
+    document.getElementById('home-btn').classList.remove('d-none')
+    document.getElementById('create-btn').classList.remove('d-none')
+    toCreate()
+});
+
+document.getElementById("home-btn").addEventListener("click", function (){
+    document.getElementById('verb-list').innerHTML= ``
+    document.getElementById('unit-name').value= ``
+    document.getElementById('verb-input').value= ``
+    toLP()
+})
+
+document.getElementById('file-input').addEventListener('change', function(event) {
+    const file = event.target.files[0]; // Get the selected file
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('pdf', file); // Append the file
+
+    fetch('http://127.0.0.1:5000/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => console.log('Success:', data))
+    .catch(error => console.error('Error:', error));
+});
+
+
+
+
 
 
 function susView (){
@@ -300,11 +371,6 @@ document.getElementById("home-button").addEventListener("click",susView);
 
 
 
-document.getElementById("new-unit").addEventListener("click",toCreate);
-const destinations = document.getElementsByClassName("destination");
 
-// Loop through each element and add an event listener
-for (let i = 0; i < destinations.length; i++) {
-    destinations[i].addEventListener("click", toTenses);
-}
+const destinations = document.getElementsByClassName("destination");
 

@@ -19,15 +19,14 @@ def login():
 @app.route('/susview', methods=['GET'])  # ändern in JS
 def toSuS():
     token = request.args.get('token')
-    if token == '1':
-        result = {
-            'username': 'Rudolf',
-            'progress': {'Présent': 0.1, 'Passé composé': 0.0, 'Imparfait': 1,'Plus-que-parfait':.75},
-            'units': {
-                '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
-                '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'
-            }}
-        return jsonify(result)
+    result = {
+        'username': 'Rudolf',
+        'progress': {'Présent': 0.1, 'Passé composé': 0.0, 'Imparfait': 1,'Plus-que-parfait':.75},
+        'units': {
+            '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
+            '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'
+        }}
+    return jsonify(result)
 
 
 
@@ -101,20 +100,17 @@ def lpclass():
         }
         return jsonify(result)
 
-# ????
 
-@app.route('/lpedit', methods=['GET'])
-def toedit():
-    token = request.args.get('token')
-    unit_id = request.args.get('class_id')
-    if token == '1':
-        result = {
-            'sus_namesx': {'1': 'Alice', '2': 'Bob', '3': 'Eve'},
-            'units': {
-                '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
-                '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'}
-        }
-        return jsonify(result)
+# upload eines pdfs
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    if 'pdf' not in request.files:
+        return jsonify({'error': 'No file uploaded'}), 400
+
+    pdf = request.files['pdf']
+    pdf.save(f'uploads/{pdf.filename}')  # Save the file
+    return jsonify({'message': 'File uploaded successfully', 'filename': pdf.filename})
 
 
 

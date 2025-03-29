@@ -64,8 +64,8 @@
             <div id="lp-classes" class="user-info">
             </div>
         </div>
-        <div id="lp-students" class="LP-left2-panel">
-            <div class="user-info">
+        <div  class="LP-left2-panel">
+            <div id="lp-students">
             </div>
         </div>
         <div class="LP-left3-panel">
@@ -75,11 +75,9 @@
         </div>
     </div>
 
-
     <div id="new-unit-view" class="new-unit-view hidden">
-        <div class="task-editor">
-            <h2>Aufgaben Bearbeiten</h2>
-            <ul class="verb-list">
+        <div class="task-editor overflow-auto vh-100 p-3 border">
+            <ul id="verb-list" class="verb-list">
                 <li>✖ Manger</li>
                 <li>✖ Parler</li>
                 <li>✖ Aimer</li>
@@ -105,18 +103,25 @@
             </ul>
         </div>
         <div class="input-section">
-            <input type="text" placeholder="Name">
-            <textarea placeholder=""></textarea>
+            <input id="unit-name" type="text" placeholder="Name">
+            <textarea id="verb-input" placeholder=""></textarea>
             <div class="button-group">
-                <button class="add-btn">+</button>
+                <button id="add-btn" class="add-btn">+</button>
                 <button class="upload-btn">⬆</button>
             </div>
-            <select>
+            <select id="class-selection">
+                <option>Klassen</option>
+                <option>Klassen</option>
+                <option>Klassen</option>
+                <option>Klassen</option>
+                <option>Klassen</option>
                 <option>Klassen</option>
             </select>
             <div class="action-buttons">
-                <button class="create-btn">Erstellen</button>
-                <button class="delete-btn">Löschen</button>
+                <button id="save-btn" class="create-btn">Speichern</button>
+                <button id="delete-btn" class="delete-btn">Löschen</button>
+                <button id="create-btn" class="create-btn">Erstellen</button>
+                <button id="home-btn" class="delete-btn">Home</button>
             </div>
         </div>
     </div>
