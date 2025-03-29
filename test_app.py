@@ -105,23 +105,55 @@ def lpclass():
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    if 'pdf' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
+    if 'pdfs' not in request.files:
+        return jsonify({'error': 'No files uploaded'}), 400
 
-    pdf = request.files['pdf']
-    pdf.save(f'uploads/{pdf.filename}')  # Save the file
-    return jsonify({'message': 'File uploaded successfully', 'filename': pdf.filename})
+    files = request.files.getlist('pdfs')  # Get multiple files
+    text = request.form.get('text')
 
+    saved_files = []
+    for pdf in files:
+        print(text)
+        print(pdf.filename)
+        saved_files.append(pdf.filename)
 
-
-
-
-
-
-
-
+    return jsonify({'message': 'Files uploaded successfully', 'files': saved_files})
 
 
+@app.route('/getunit', methods=['GET'])
+def lpclass():
+    token = request.args.get('token')
+    unit_id = request.args.get('unit_id')
+    result = {
+        'unit_name': 'Unité 3',
+        'classes': {'1': 'G1A', '2': 'G4H'},
+        'verbs': {
+            '1': 'Manger', '2': 'Parler', '3': 'Aimer', '4': 'Marcher',
+            '5': 'Jouer', '6': 'Travailler', '7': 'Étudier', '8': 'Regarder',
+            '9': 'Écouter', '10': 'Chanter', '11': 'Dormir', '12': 'Finir',
+            '13': 'Vivre', '14': 'Aller', '15': 'Venir', '16': 'Lire',
+            '17': 'Écrire', '18': 'Comprendre', '19': 'Savoir'
+        }
+    }
+    return jsonify(result)
+
+@app.route('/createunit', methods=['GET'])
+def lpclass():
+    data = request.get_json()  # Get JSON data
+    new_unit = data.get("new_unit")  # Extract "score" object
+    return '', 204
+
+@app.route('/saveunit', methods=['GET'])
+def lpclass():
+    data = request.get_json()  # Get JSON data
+    new_unit = data.get("new_unit")  # Extract "score" object
+    return '', 204
+
+@app.route('/deleteunit', methods=['GET'])
+def lpclass():
+    token = request.args.get('token')
+    unit_id = request.args.get('unit_id')
+    return '', 204
 
 
 if __name__ == '__main__':

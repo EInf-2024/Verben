@@ -1,4 +1,5 @@
 let token = 0
+let selectedFiles = []; // Store selected files
 
 function toSuS() {
     document.getElementById('navbar').classList.add('d-none');
@@ -179,16 +180,42 @@ document.getElementById("home-btn").addEventListener("click", function (){
     document.getElementById('verb-list').innerHTML= ``
     document.getElementById('unit-name').value= ``
     document.getElementById('verb-input').value= ``
+    selectedFiles = []
+    document.getElementById('file-list').innerHTML = '';
+    document.getElementById('file-input').value = ``
     toLP()
 })
 
+
+// pdf file upload
+
+
+    // Handle file selection
 document.getElementById('file-input').addEventListener('change', function(event) {
-    const file = event.target.files[0]; // Get the selected file
-    if (!file) return;
+    const files = Array.from(event.target.files); // Convert FileList to Array
+    selectedFiles = [...selectedFiles, ...files]; // Append new files instead of replacing
 
+    //  Update file list display
+    const fileList = document.getElementById('file-list');
+    fileList.innerHTML = ''; // Clear previous list
+    selectedFiles.forEach(file => {
+        const listItem = document.createElement('li');
+        listItem.textContent = file.name;
+        fileList.appendChild(listItem);
+    });
+});
+
+//  Handle file & text upload on button click
+document.getElementById('add-btn').addEventListener('click', function() {
     const formData = new FormData();
-    formData.append('pdf', file); // Append the file
 
+    //  Append files **only if there are selected files**
+    selectedFiles.forEach(file => formData.append('pdfs', file));
+
+    //  Append text (text is always sent, even if empty)
+    formData.append("text", document.getElementById("verb-input").value);
+
+    //  Send request (even if no files, but always with text)
     fetch('http://127.0.0.1:5000/upload', {
         method: 'POST',
         body: formData
@@ -197,8 +224,6 @@ document.getElementById('file-input').addEventListener('change', function(event)
     .then(data => console.log('Success:', data))
     .catch(error => console.error('Error:', error));
 });
-
-
 
 
 
