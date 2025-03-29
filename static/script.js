@@ -85,15 +85,52 @@ function lpView(){
         .then(data => {
             document.getElementById('lp-user-btn').textContent = data.username
             document.getElementById('lp-classes').innerHTML = ``
+            document.getElementById('lp-classes').innerHTML=``
             for (const cl in data.classes) {
                 const grade = document.createElement('p');
                 grade.innerHTML = `${data.classes[cl]}`
                 grade.setAttribute("data_id", `${cl}`)
                 document.getElementById('lp-classes').appendChild(grade)
-
+            }
+            document.getElementById('lp-units').innerHTML=``
+            for (const unit in data.units) {
+                const unit_field = document.createElement('div');
+                unit_field.classList.add('unit-field')
+                unit_field.innerHTML = `${data.units[unit]}`
+                unit_field.setAttribute("data_id", `${unit}`)
+                document.getElementById('lp-units').appendChild(unit_field)
             }
         });
 }
+
+document.getElementById("lp-classes").addEventListener("click",function (event) {
+    if (event.target.tagName === "P") {
+        const classId = event.target.getAttribute("data_id");
+        const objectName = event.target.textContent
+        console.log(classId)
+        console.log(objectName)
+
+        fetch(`http://127.0.0.1:5000/lpclass?token=${encodeURIComponent(token)}&class_id=${encodeURIComponent(classId)}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('lp-units').innerHTML=``
+                for (const unit in data.units) {
+                const unit_field = document.createElement('div');
+                unit_field.classList.add('unit-field')
+                unit_field.innerHTML = `${data.units[unit]}`
+                unit_field.setAttribute("data_id", `${unit}`)
+                document.getElementById('lp-units').appendChild(unit_field)
+            }
+                for (const student in data.sus_names) {
+                const student_field = document.createElement('p');
+                student_field.innerHTML = `${data.classes[cl]}`
+                student_field.setAttribute("data_id", `${cl}`)
+                document.getElementById('lp-classes').appendChild(grade)
+            }
+            })
+    }
+});
+
 
 function susView (){
     toSuS()

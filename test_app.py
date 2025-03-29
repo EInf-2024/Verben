@@ -97,8 +97,7 @@ def lpclass():
         result = {
             'sus_names': {'1': 'Alice', '2': 'Bob', '3': 'Eve'},
             'units': {
-                '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
-                '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'}
+                '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3'}
         }
         return jsonify(result)
 
