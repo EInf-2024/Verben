@@ -95,7 +95,7 @@ function lpView(){
                 grade.innerHTML = `${data.classes[cl]}`
                 grade_option.innerHTML = `${data.classes[cl]}`
                 grade.setAttribute("data_id", `${cl}`)
-                grade_option.setAttribute("data_id", `${cl}`)
+                grade_option.value =`${cl}`
                 document.getElementById('lp-classes').appendChild(grade)
                 document.getElementById('class-selection').appendChild(grade_option)
 
@@ -248,7 +248,7 @@ document.getElementById('create-btn').addEventListener('click',function(){
 
     const unit_name = document.getElementById('unit-name').value
     const selectElement = document.getElementById("class-selection");
-    const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.getAttribute('data_id'));
+    const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
     console.log(selectedValues); // Logs an array of selected values
 
     const verbList = document.querySelectorAll("#verb-list li");
@@ -275,8 +275,81 @@ document.getElementById('create-btn').addEventListener('click',function(){
         }
     })
     .catch(error => console.error("Fetch error:", error));
+
 });
 
+
+document.getElementById("lp-units").addEventListener("click",function (event) {
+    if (event.target.tagName === "DIV") {
+        const objectId = event.target.getAttribute("data_id");
+
+        fetch(`http://127.0.0.1:5000/getunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(objectId)}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('unit-name').value = data.unit_name
+                document.getElementById('unit-name').setAttribute('data_id',objectId)
+
+                const classKeys = Object.keys(data.classes); // Extract the keys
+                for (const option of document.getElementById('class-selection').options) {
+                    if (classKeys.includes(option.value)) {
+                        option.selected = true;
+                    }
+                }
+                for (const verb in data.verbs){
+                    const verb_container = document.createElement('li');
+                    verb_container.innerHTML = `✖${data.verbs[verb]}`
+                    verb_container.setAttribute('data_id',`${verb}`)
+                    document.getElementById('verb-list').appendChild(verb_container)
+                }
+
+            })
+
+        document.getElementById('save-btn').classList.remove('d-none')
+        document.getElementById('delete-btn').classList.remove('d-none')
+        document.getElementById('home-btn').classList.add('d-none')
+        document.getElementById('create-btn').classList.add('d-none')
+        toCreate()
+    }
+});
+
+document.getElementById('save-btn').addEventListener('click',function(){
+
+    const unit_name = document.getElementById('unit-name').value
+    const unit_id = document.getElementById('unit-name').getAttribute('data_id')
+    console.log(unit_id)
+    const selectElement = document.getElementById("class-selection");
+    const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
+    console.log(selectedValues); // Logs an array of selected values
+
+    const verbList = document.querySelectorAll("#verb-list li");
+    const verbs = Array.from(verbList).map(li => li.textContent.replace("✖", "").trim());
+    console.log(verbs);
+
+    let unit = {
+        'unit_id': unit_id,
+        'token':`${token}`,
+        'unit_name':`${unit_name}`,
+        'selected_classes': selectedValues,
+        'verbs': verbs,
+    }
+    console.log(unit)
+
+    fetch("http://127.0.0.1:5000/saveunit", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ unit: unit }) // Send the entire object
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error("Error:", response.statusText);
+        } else {
+            console.log("unit sent successfully");
+        }
+    })
+    .catch(error => console.error("Fetch error:", error));
+    console.log('saved')
+    lpView()
+});
 
 
 

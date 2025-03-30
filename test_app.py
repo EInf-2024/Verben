@@ -155,7 +155,11 @@ def createunit():
 @app.route('/saveunit', methods=['POST'])
 def saveunit():
     data = request.get_json()  # Get JSON data
-    new_unit = data.get("new_unit")  # Extract "score" object
+    new_unit = data.get("unit")
+    print(new_unit['verbs'])
+    print(new_unit['unit_name'])
+    print(new_unit['unit_id'])
+    print(new_unit['selected_classes'])
     return '', 204
 
 @app.route('/deleteunit', methods=['DELETE'])
