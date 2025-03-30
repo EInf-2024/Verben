@@ -81,7 +81,17 @@ function login (){
 document.getElementById('lp-user-btn').addEventListener("click",lpView)
 
 function lpView(){
-    toLP()
+    document.getElementById('verb-list').innerHTML= ``
+    document.getElementById('unit-name').value= ``
+    document.getElementById('verb-input').value= ``
+    selectedFiles = []
+    document.getElementById('file-list').innerHTML = '';
+    document.getElementById('file-input').value = ``
+    for (const option of document.getElementById('class-selection').options) {
+        option.selected = false;
+    }
+
+
     document.getElementById('lp-students').classList.add('d-none')
     fetch(`http://127.0.0.1:5000/lpview?token=${encodeURIComponent(token)}`)
         .then(response => response.json())
@@ -110,6 +120,7 @@ function lpView(){
                 document.getElementById('lp-units').appendChild(unit_field)
             }
         });
+    toLP()
 }
 
 document.getElementById("lp-classes").addEventListener("click",function (event) {
@@ -166,9 +177,6 @@ document.getElementById("lp-students").addEventListener("click",function (event)
 
 
 document.getElementById("new-unit").addEventListener("click",function(){
-    document.getElementById('verb-list').innerHTML= ``
-    document.getElementById('unit-name').value= ``
-    document.getElementById('verb-input').value= ``
     document.getElementById('save-btn').classList.add('d-none')
     document.getElementById('delete-btn').classList.add('d-none')
     document.getElementById('home-btn').classList.remove('d-none')
@@ -177,14 +185,28 @@ document.getElementById("new-unit").addEventListener("click",function(){
 });
 
 document.getElementById("home-btn").addEventListener("click", function (){
-    document.getElementById('verb-list').innerHTML= ``
-    document.getElementById('unit-name').value= ``
-    document.getElementById('verb-input').value= ``
-    selectedFiles = []
-    document.getElementById('file-list').innerHTML = '';
-    document.getElementById('file-input').value = ``
-    toLP()
+    lpView()
 })
+
+document.getElementById('delete-btn').addEventListener('click',function(){
+    const unit_id = document.getElementById('unit-name').getAttribute('data_id')
+    fetch(`http://127.0.0.1:5000/deleteunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(unit_id)}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - ${response.statusText}`);
+            }
+            return response.text(); // Read response as text
+    })
+    .then(message => {
+        console.log("Server response:", message); // Log the success message
+    })
+    .catch(error => console.error("Fetch error:", error));
+    lpView()
+
+
+
+
+});
 
 
 // pdf file upload
@@ -350,6 +372,20 @@ document.getElementById('save-btn').addEventListener('click',function(){
     console.log('saved')
     lpView()
 });
+
+
+document.getElementById("verb-list").addEventListener("click",function (event) {
+    if (event.target.tagName === "LI") {
+        const objectId = event.target.getAttribute("data_id");
+
+
+
+
+
+
+
+
+
 
 
 

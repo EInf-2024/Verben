@@ -162,11 +162,12 @@ def saveunit():
     print(new_unit['selected_classes'])
     return '', 204
 
-@app.route('/deleteunit', methods=['DELETE'])
+@app.route('/deleteunit', methods=['GET'])
 def deleteunit():
     token = request.args.get('token')
     unit_id = request.args.get('unit_id')
-    return '', 204
+
+    return "Unit deleted successfully", 200
 
 
 if __name__ == '__main__':
