@@ -1,4 +1,4 @@
-let token = 0
+let token = 0 // Store user token
 let selectedFiles = []; // Store selected files
 
 function toSuS() {
@@ -221,9 +221,62 @@ document.getElementById('add-btn').addEventListener('click', function() {
         body: formData
     })
     .then(response => response.json())
-    .then(data => console.log('Success:', data))
+    .then(data => {
+        for (const verb in data.verbs){
+
+            console.log(verb)
+            console.log(data.verbs[verb])
+            const verb_container = document.createElement('li');
+            verb_container.innerHTML = `✖${data.verbs[verb]}`
+            verb_container.setAttribute('data_id',`${verb}`)
+            document.getElementById('verb-list').appendChild(verb_container)
+        }
+
+    })
     .catch(error => console.error('Error:', error));
+
+    selectedFiles = []
+    document.getElementById('file-list').innerHTML = '';
+    document.getElementById('file-input').value = ``
+    document.getElementById('verb-input').value= ``
+
 });
+
+// create unit
+
+document.getElementById('create-btn').addEventListener('click',function(){
+
+    const unit_name = document.getElementById('unit-name').value
+    const selectElement = document.getElementById("class-selection");
+    const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.getAttribute('data_id'));
+    console.log(selectedValues); // Logs an array of selected values
+
+    const verbList = document.querySelectorAll("#verb-list li");
+    const verbs = Array.from(verbList).map(li => li.textContent.replace("✖", "").trim());
+    console.log(verbs);
+
+    let unit = {
+        'token':`${token}`,
+        'unit_name':`${unit_name}`,
+        'selected_classes': selectedValues,
+        'verbs': verbs,
+    }
+
+    fetch("http://127.0.0.1:5000/createunit", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ unit: unit }) // Send the entire object
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error("Error:", response.statusText);
+        } else {
+            console.log("unit sent successfully");
+        }
+    })
+    .catch(error => console.error("Fetch error:", error));
+});
+
 
 
 
@@ -261,6 +314,11 @@ function susView (){
         })
         .catch(error => console.error('Fehler', error))
 }
+
+
+
+
+
 
 document.getElementById("sus-right").addEventListener("click",function (event) {
     if (event.target.tagName === "DIV") {

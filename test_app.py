@@ -105,11 +105,9 @@ def lpclass():
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    if 'pdfs' not in request.files:
-        return jsonify({'error': 'No files uploaded'}), 400
 
-    files = request.files.getlist('pdfs')  # Get multiple files
     text = request.form.get('text')
+    files = request.files.getlist('pdfs')  # Get multiple files
 
     saved_files = []
     for pdf in files:
@@ -117,11 +115,17 @@ def upload():
         print(pdf.filename)
         saved_files.append(pdf.filename)
 
-    return jsonify({'message': 'Files uploaded successfully', 'files': saved_files})
+    result = {
+        'verbs': {
+            '1': 'Manger', '2': 'Parler', '3': 'Aimer', '4': 'Marcher',
+            '5': 'Jouer', '6': 'Travailler', '7': 'Étudier'}
+    }
+
+    return jsonify(result)
 
 
 @app.route('/getunit', methods=['GET'])
-def lpclass():
+def getunit():
     token = request.args.get('token')
     unit_id = request.args.get('unit_id')
     result = {
@@ -137,20 +141,25 @@ def lpclass():
     }
     return jsonify(result)
 
-@app.route('/createunit', methods=['GET'])
-def lpclass():
+
+@app.route('/createunit', methods=['POST'])
+def createunit():
+    data = request.get_json()  # Get JSON data
+    new_unit = data.get("unit")
+    print(new_unit['verbs'])
+    print(new_unit['unit_name'])
+    print(new_unit['selected_classes'])
+    return '', 204
+
+
+@app.route('/saveunit', methods=['POST'])
+def saveunit():
     data = request.get_json()  # Get JSON data
     new_unit = data.get("new_unit")  # Extract "score" object
     return '', 204
 
-@app.route('/saveunit', methods=['GET'])
-def lpclass():
-    data = request.get_json()  # Get JSON data
-    new_unit = data.get("new_unit")  # Extract "score" object
-    return '', 204
-
-@app.route('/deleteunit', methods=['GET'])
-def lpclass():
+@app.route('/deleteunit', methods=['DELETE'])
+def deleteunit():
     token = request.args.get('token')
     unit_id = request.args.get('unit_id')
     return '', 204
