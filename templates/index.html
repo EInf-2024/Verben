@@ -9,15 +9,18 @@
 
 </head>
 <body>
-    <header id="navbar" class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom d-none fixed-top w-100 bg-white">
-        <div class="container-fluid">
-            <button id="home-button" class="btn btn-light">Home</button>
-            <p id="nav-unit-name" class="m-0 text-black fw-bold">Unité Name</p>
-            <button id="check-answers-button" class="btn btn-light">Vérifier les réponses</button>
-            <p id="percentage" ></p>
-        </div>
+
+    <! –– navigation bar for SuS when in exercise view ––>
+    <header id="navbar" class="d-none d-flex flex-row justify-content-center align-items-center fixed-top bg-white px-3 py-2 w-100 gap-5">
+        <button id="home-button" class="btn btn-info w-auto">Home</button>
+        <p id="nav-unit-name" class="mb-0"></p>
+        <button id="start-training-button" class="btn btn-success w-auto">Start Training</button>
+        <button id="check-answers-button" class="btn btn-info w-auto">Vérifier les réponses</button>
+        <p id="percentage" class="mb-0"></p>
     </header>
 
+
+    <! –– login view ––>
     <div id="login-view" class="container d-flex justify-content-center align-items-center vh-100">
         <div class="card p-4 shadow-lg" style="width: 350px;">
             <h2 class="text-center mb-4">Login</h2>
@@ -27,37 +30,27 @@
         </div>
     </div>
 
+    <! –– SuS view ––>
     <div id="sus-view" class="view-container hidden">
         <div class="left-panel">
             <h2 id="username"></h2>
-            <div class="user-info" id="user-info">
-
-            </div>
+            <div class="user-info" id="user-info"></div>
         </div>
-
-        <div id="sus-right" class="right-panel">
-        </div>
-
+        <div id="sus-right" class="right-panel"></div>
     </div>
 
-
-    <div id="tense-selection-view" class="hidden view-container">
+    <! –– tense selection view ––>
+    <div id="tense-selection-view" class="hidden view-container pt-6">
         <h2>Select French Tenses</h2>
-
-        <form id="tense-form">
-        </form>
-
-        <div id="start-training-container">
-            <button id="start-training-button">Start Training</button>
-        </div>
+        <form id="tense-form"></form>
     </div>
 
-    <div id="exercise-view" class="hidden">
-    </div>
+    <! –– exercise view ––>
+    <div id="exercise-view" class="hidden pt-6"></div>
+
+
 
     <! –– End of SuS possibilities ––>
-
-
     <div id="lp-view" class="view-container hidden h2">
         <div class="LP-left1-panel">
             <button id="lp-user-btn" class="btn btn-primary w-100 justify-content-center "></button>

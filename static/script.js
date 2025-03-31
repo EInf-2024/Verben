@@ -297,6 +297,7 @@ document.getElementById('create-btn').addEventListener('click',function(){
         }
     })
     .catch(error => console.error("Fetch error:", error));
+    lpView()
 
 });
 
@@ -374,19 +375,15 @@ document.getElementById('save-btn').addEventListener('click',function(){
 });
 
 
-document.getElementById("verb-list").addEventListener("click",function (event) {
+document.getElementById("verb-list").addEventListener("click", function (event) {
     if (event.target.tagName === "LI") {
-        const objectId = event.target.getAttribute("data_id");
+        event.target.remove(); // Remove the clicked item
+    }
+});
 
 
 
-
-
-
-
-
-
-
+// SuS functions
 
 
 
@@ -563,6 +560,4 @@ document.getElementById("home-button").addEventListener("click",susView);
 
 
 
-
-const destinations = document.getElementsByClassName("destination");
 
