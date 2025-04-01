@@ -21,7 +21,18 @@ def toSuS():
     token = request.args.get('token')
     result = {
         'username': 'Rudolf',
-        'progress': {'Présent': 0.1, 'Passé composé': 0.0, 'Imparfait': 1,'Plus-que-parfait':.75},
+        'progress': {
+            'Présent': 0.81,
+            'Passé composé': 0.25,
+            'Imparfait': 0.91,
+            'Plus-que-parfait': 0.12,
+            'Futur simple': 0.97,
+            'Conditionnel présent': 0.98,
+            'Conditionnel passé': 0.79,
+            'Subjonctif présent': 0.17,
+            'Subjonctif passé': 0.41,
+            'Impératif': 0.73
+        },
         'units': {
             '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
             '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'
@@ -80,7 +91,7 @@ def toLP():
     if token == '1':
         result = {
             'username': 'Mrs.French ',
-            'classes': {'1': 'G1A', '2': 'G1B', '3': 'G4H'},
+            'classes': {'1': 'G1A', '2': 'G1B', '3': 'G4H', '4': 'G1A', '5': 'G1B', '6': 'G4H', '7': 'G1A', '8': 'G1B', '9': 'G4H', '10': 'G1A', '11': 'G1B', '12': 'G4H'},
             'units': {
                 '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
                 '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'}
@@ -94,7 +105,7 @@ def lpclass():
     class_id = request.args.get('class_id')
     if token == '1':
         result = {
-            'sus_names': {'1': 'Alice', '2': 'Bob', '3': 'Eve'},
+            'sus_names': {'1': 'AliceAliceAlice', '2': 'Bob', '3': 'Eve','4': 'Alice', '5': 'Bob', '6': 'Eve','7': 'Alice', '8': 'Bob', '9': 'Eve','10': 'Alice', '11': 'Bob', '12': 'Eve'},
             'units': {
                 '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3'}
         }

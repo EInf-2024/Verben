@@ -26,16 +26,13 @@
             <h2 class="text-center mb-4">Login</h2>
             <input id="input-name" type="text" class="form-control mb-3" placeholder="Name">
             <input id="input-password" type="password" class="form-control mb-3" placeholder="Password">
-            <button id="login-button" class="btn btn-primary w-100">Log In</button>
+            <button id="login-button" class="btn btn-dark w-100">Log In</button>
         </div>
     </div>
 
     <! –– SuS view ––>
     <div id="sus-view" class="view-container hidden">
-        <div class="left-panel">
-            <h2 id="username"></h2>
-            <div class="user-info" id="user-info"></div>
-        </div>
+        <div id="sus-left-panel" class="left-panel"></div>
         <div id="sus-right" class="right-panel"></div>
     </div>
 
@@ -51,22 +48,22 @@
 
 
     <! –– End of SuS possibilities ––>
+
+
+    <! –– LP view  ––>
     <div id="lp-view" class="view-container hidden h2">
-        <div class="LP-left1-panel">
-            <button id="lp-user-btn" class="btn btn-primary w-100 justify-content-center "></button>
-            <div id="lp-classes" class="user-info">
-            </div>
+        <div class="LP-left1-panel scrollbar">
+            <div id="lp-user-btn" class="cursor-pointer user-select-none d-flex position-sticky top-0 bg-light w-100 h4 p-3 border-bottom justify-content-center "></div>
+            <div id="lp-classes" class="lp-user-info bg-light p-3 text-center"></div>
         </div>
-        <div  class="LP-left2-panel">
-            <div id="lp-students">
-            </div>
-        </div>
-        <div class="LP-left3-panel">
+        <div id="lp-students" class="LP-left2-panel scrollbar"></div>
+        <div class="LP-left4-panel">
             <button id="new-unit">new Unit</button>
-            <div id="lp-units" class="unit-field-container">
-            </div>
         </div>
+        <div id="lp-units" class="LP-left3-panel scrollbar"></div>
     </div>
+
+
 
     <div id="new-unit-view" class="new-unit-view hidden">
         <div class="task-editor overflow-auto vh-100 p-3 border">

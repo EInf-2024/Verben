@@ -64,6 +64,7 @@ document.getElementById("login-button").addEventListener("click",login)
 function login (){
     const username = document.getElementById('input-name').value
     const password = document.getElementById('input-password').value
+
     fetch(`http://127.0.0.1:5000/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`)
         .then(response => response.json())
         .then(data => {
@@ -90,15 +91,21 @@ function lpView(){
     for (const option of document.getElementById('class-selection').options) {
         option.selected = false;
     }
-
-
+    document.querySelector('.LP-left3-panel').style.marginLeft = '10%'
+    document.querySelector('.LP-left3-panel').style.width = '82%'
     document.getElementById('lp-students').classList.add('d-none')
+
+
+
+
     fetch(`http://127.0.0.1:5000/lpview?token=${encodeURIComponent(token)}`)
         .then(response => response.json())
         .then(data => {
             document.getElementById('lp-user-btn').textContent = data.username
             document.getElementById('lp-classes').innerHTML = ``
             document.getElementById('class-selection').innerHTML=``
+
+
             for (const cl in data.classes) {
                 const grade = document.createElement('p');
                 const grade_option = document.createElement('option')
@@ -106,6 +113,7 @@ function lpView(){
                 grade_option.innerHTML = `${data.classes[cl]}`
                 grade.setAttribute("data_id", `${cl}`)
                 grade_option.value =`${cl}`
+                grade.classList.add("class-circle", "d-flex", "align-items-center", "justify-content-center","bg-info","cursor-pointer","user-select-none")
                 document.getElementById('lp-classes').appendChild(grade)
                 document.getElementById('class-selection').appendChild(grade_option)
 
@@ -126,8 +134,11 @@ function lpView(){
 document.getElementById("lp-classes").addEventListener("click",function (event) {
     if (event.target.tagName === "P") {
         const classId = event.target.getAttribute("data_id");
-        const objectName = event.target.textContent
+        document.querySelector('.LP-left3-panel').style.marginLeft = '25%'
+        document.querySelector('.LP-left3-panel').style.width = '67%'
         document.getElementById('lp-students').classList.remove('d-none')
+
+
         fetch(`http://127.0.0.1:5000/lpclass?token=${encodeURIComponent(token)}&class_id=${encodeURIComponent(classId)}`)
             .then(response => response.json())
             .then(data => {
@@ -144,6 +155,7 @@ document.getElementById("lp-classes").addEventListener("click",function (event) 
                     const student_field = document.createElement('p');
                     student_field.innerHTML = `${data.sus_names[student]}`
                     student_field.setAttribute("data_id", `${student}`)
+                    student_field.classList.add("class-box", "d-flex", "align-items-center", "justify-content-center","bg-info","cursor-pointer","user-select-none")
                     document.getElementById('lp-students').appendChild(student_field)
 
                 }
@@ -393,18 +405,20 @@ function susView (){
     fetch(`http://127.0.0.1:5000/susview?token=${encodeURIComponent(token)}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById("username").innerHTML = `${data.username}`
-            document.getElementById('user-info').innerHTML = ``
+            document.getElementById("sus-left-panel").innerHTML = `<h2>${data.username}</h2>`
+
             for (const tense in data.progress) {
                 if (parseFloat(data.progress[tense]) != 0) {
                     const progressContainer = document.createElement('p');
-                    progressContainer.id = 'progress-container';
                     if (data.progress.hasOwnProperty(tense)) {
                         progressContainer.innerHTML = `
-                            ${tense} <progress id="progress-bar" value="${data.progress[tense]}" max="1"></progress>
+                            <div class="progress position-relative" style="width: 18vw; height: 2.5vw;">
+                                <div class="progress-bar bg-info text-dark" role="progressbar" style="width: ${parseFloat(data.progress[tense])*100}%;"></div>
+                                <span class="position-absolute w-100 text-center" style="font-size: 1.2vw; top: 50%; transform: translateY(-50%);">${tense}</span>
+                            </div>
                         `;
                     }
-                    document.getElementById('user-info').appendChild(progressContainer);
+                    document.getElementById('sus-left-panel').appendChild(progressContainer);
                 }
             }
             const container = document.getElementById("sus-right");
