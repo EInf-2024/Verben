@@ -66,24 +66,38 @@
         <div class="input-section">
 
             <input id="unit-name" type="text" placeholder="Name">
-            <div class="verb-container">
-                <textarea id="verb-input" placeholder=""></textarea>
-                <div class="position-bottom-right">
-                    <input class="d-none" type="file" id="file-input" accept="application/pdf" multiple>
-                    <button id="add-file-btn" class="btn btn-dark">+</button>
-                    <button id="add-btn" class="btn btn-dark">↑</button>
+
+            <div class="verb-container position-relative">
+                <textarea id="verb-input" class="form-control border border-3 border-dark shadow-none"></textarea>
+
+                <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-between align-items-center p-2 bar-background">
+                    <div class="d-flex align-items-center">
+                        <button id="add-file-btn" class="btn btn-dark btn-sm">+</button>
+                        <ul id="file-list" class="list-unstyled mb-0 ms-2"></ul>
+                    </div>
+                    <button id="add-btn" class="btn btn-dark btn-sm">↑</button>
+                </div>
+
+                <!-- Hidden file input -->
+                <input class="d-none" type="file" id="file-input" accept="application/pdf" multiple>
+            </div>
+
+
+
+
+            <div class="action-buttons d-flex justify-content-between align-items-start">
+                <!-- Left: Select Dropdown -->
+                <select id="class-selection" class="w-25" multiple></select>
+
+                <!-- Right: Buttons in a Vertical Column -->
+                <div class="d-flex flex-column w-75">
+                    <button id="save-btn" class="btn btn-outline-dark">Speichern</button>
+                    <button id="delete-btn" class="btn btn-outline-danger">Löschen</button>
+                    <button id="create-btn" class="btn btn-outline-dark">Erstellen</button>
+                    <button id="home-btn" class="btn btn-outline-danger">Home</button>
                 </div>
             </div>
 
-            <ul id="file-list"></ul>
-            <select id="class-selection" multiple></select>
-
-            <div class="action-buttons">
-                <button id="save-btn" class="btn btn-outline-dark">Speichern</button>
-                <button id="delete-btn" class="btn btn-outline-danger">Löschen</button>
-                <button id="create-btn" class="btn btn-outline-dark">Erstellen</button>
-                <button id="home-btn" class="btn btn-outline-danger">Home</button>
-            </div>
         </div>
     </div>
 

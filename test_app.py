@@ -16,7 +16,7 @@ def login():
 
 #g
 
-@app.route('/susview', methods=['GET'])  # ändern in JS
+@app.route('/susview', methods=['GET'])
 def toSuS():
     token = request.args.get('token')
     result = {
@@ -177,7 +177,6 @@ def saveunit():
 def deleteunit():
     token = request.args.get('token')
     unit_id = request.args.get('unit_id')
-
     return "Unit deleted successfully", 200
 
 
