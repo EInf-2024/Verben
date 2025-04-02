@@ -4,54 +4,54 @@ let selectedFiles = []; // Store selected files
 function toSuS() {
     document.getElementById('navbar').classList.add('d-none');
     document.getElementById('login-view').classList.add('d-none');
-    document.getElementById('sus-view').classList.remove('hidden');
-    document.getElementById('tense-selection-view').classList.add('hidden');
-    document.getElementById('exercise-view').classList.add('hidden');
-    document.getElementById('lp-view').classList.add('hidden');
-    document.getElementById('new-unit-view').classList.add('hidden');
+    document.getElementById('sus-view').classList.remove('d-none');
+    document.getElementById('tense-selection-view').classList.add('d-none');
+    document.getElementById('exercise-view').classList.add('d-none');
+    document.getElementById('lp-view').classList.add('d-none');
+    document.getElementById('new-unit-view').classList.add('d-none');
 }
 
 function toTenses() {
     document.getElementById('navbar').classList.remove('d-none');
-    document.getElementById('login-view').classList.add('hidden');
-    document.getElementById('sus-view').classList.add('hidden');
-    document.getElementById('tense-selection-view').classList.remove('hidden');
-    document.getElementById('exercise-view').classList.add('hidden');
-    document.getElementById('lp-view').classList.add('hidden');
-    document.getElementById('new-unit-view').classList.add('hidden');
-    document.getElementById('check-answers-button').classList.add('hidden')
+    document.getElementById('login-view').classList.add('d-none');
+    document.getElementById('sus-view').classList.add('d-none');
+    document.getElementById('tense-selection-view').classList.remove('d-none');
+    document.getElementById('exercise-view').classList.add('d-none');
+    document.getElementById('lp-view').classList.add('d-none');
+    document.getElementById('new-unit-view').classList.add('d-none');
+    document.getElementById('check-answers-button').classList.add('d-none')
 }
 
 function toExercise() {
-    document.getElementById('navbar').classList.remove('hidden');
-    document.getElementById('login-view').classList.add('hidden');
-    document.getElementById('sus-view').classList.add('hidden');
-    document.getElementById('tense-selection-view').classList.add('hidden');
-    document.getElementById('exercise-view').classList.remove('hidden');
-    document.getElementById('lp-view').classList.add('hidden');
-    document.getElementById('new-unit-view').classList.add('hidden');
-    document.getElementById('check-answers-button').classList.remove('hidden')
+    document.getElementById('navbar').classList.remove('d-none');
+    document.getElementById('login-view').classList.add('d-none');
+    document.getElementById('sus-view').classList.add('d-none');
+    document.getElementById('tense-selection-view').classList.add('d-none');
+    document.getElementById('exercise-view').classList.remove('d-none');
+    document.getElementById('lp-view').classList.add('d-none');
+    document.getElementById('new-unit-view').classList.add('d-none');
+    document.getElementById('check-answers-button').classList.remove('d-none')
 
 }
 
 function toLP() {
-    document.getElementById('navbar').classList.add('hidden');
+    document.getElementById('navbar').classList.add('d-none');
     document.getElementById('login-view').classList.add('d-none');
-    document.getElementById('sus-view').classList.add('hidden');
-    document.getElementById('tense-selection-view').classList.add('hidden');
-    document.getElementById('exercise-view').classList.add('hidden');
-    document.getElementById('lp-view').classList.remove('hidden');
-    document.getElementById('new-unit-view').classList.add('hidden');
+    document.getElementById('sus-view').classList.add('d-none');
+    document.getElementById('tense-selection-view').classList.add('d-none');
+    document.getElementById('exercise-view').classList.add('d-none');
+    document.getElementById('lp-view').classList.remove('d-none');
+    document.getElementById('new-unit-view').classList.add('d-none');
 
 }
 function toCreate() {
-    document.getElementById('navbar').classList.add('hidden');
-    document.getElementById('login-view').classList.add('hidden');
-    document.getElementById('sus-view').classList.add('hidden');
-    document.getElementById('tense-selection-view').classList.add('hidden');
-    document.getElementById('exercise-view').classList.add('hidden');
-    document.getElementById('lp-view').classList.add('hidden');
-    document.getElementById('new-unit-view').classList.remove('hidden');
+    document.getElementById('navbar').classList.add('d-none');
+    document.getElementById('login-view').classList.add('d-none');
+    document.getElementById('sus-view').classList.add('d-none');
+    document.getElementById('tense-selection-view').classList.add('d-none');
+    document.getElementById('exercise-view').classList.add('d-none');
+    document.getElementById('lp-view').classList.add('d-none');
+    document.getElementById('new-unit-view').classList.remove('d-none');
     console.log('new Unit')
 }
 /*
@@ -224,6 +224,9 @@ document.getElementById('delete-btn').addEventListener('click',function(){
 // pdf file upload
 
 
+document.getElementById("add-file-btn").addEventListener("click", () => {
+    document.getElementById("file-input").click();
+});
     // Handle file selection
 document.getElementById('file-input').addEventListener('change', function(event) {
     const files = Array.from(event.target.files); // Convert FileList to Array
@@ -238,6 +241,8 @@ document.getElementById('file-input').addEventListener('change', function(event)
         fileList.appendChild(listItem);
     });
 });
+
+
 
 //  Handle file & text upload on button click
 document.getElementById('add-btn').addEventListener('click', function() {
@@ -451,15 +456,16 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
         fetch(`http://127.0.0.1:5000/tenses?token=${encodeURIComponent(token)}`)
             .then(response => response.json())
             .then(data => {
-                document.getElementById("tense-form").innerHTML=``
+                document.getElementById("tense-selection-view").innerHTML=`<h2>Select French Tenses</h2>`
                 for (const tense in data) {
                     if(data[tense]){
                         const tenseDiv = document.createElement('div');
-                        tenseDiv.classList.add('tense');
-                        tenseDiv.innerHTML = `<input type="checkbox" name="tense" value="${tense}"><label for="${tense}"></label>`;
-                        tenseDiv.querySelector('label').textContent = tense;
-                        document.getElementById("tense-form").appendChild(tenseDiv)
-
+                        tenseDiv.classList.add('form-check');
+                        tenseDiv.innerHTML=`
+                          <input class="form-check-input" type="checkbox" name="tense" value="${tense}">
+                          <label class="form-check-label" for="${tense}">${tense}</label>  
+                        `
+                        document.getElementById("tense-selection-view").appendChild(tenseDiv)
                     }
                 }
             })
@@ -509,7 +515,7 @@ document.getElementById("check-answers-button").addEventListener("click",functio
     let cur_score = [0,0]
     const button_clicks = document.getElementById("check-answers-button").getAttribute("clicked")
     if (parseInt(button_clicks) === 1){
-        document.getElementById("check-answers-button").classList.add("hidden")
+        document.getElementById("check-answers-button").classList.add("d-none")
     }
     const sentences = document.querySelectorAll('.gap-sentence');
     sentences.forEach(sentence => {

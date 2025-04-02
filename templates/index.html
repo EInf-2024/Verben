@@ -31,63 +31,62 @@
     </div>
 
     <! –– SuS view ––>
-    <div id="sus-view" class="view-container hidden">
+    <div id="sus-view" class="view-container d-none">
         <div id="sus-left-panel" class="left-panel"></div>
         <div id="sus-right" class="right-panel"></div>
     </div>
 
     <! –– tense selection view ––>
-    <div id="tense-selection-view" class="hidden view-container pt-6">
-        <h2>Select French Tenses</h2>
-        <form id="tense-form"></form>
-    </div>
+    <div id="tense-selection-view" class="d-none view-container d-flex flex-column align-items-center justify-content-center vh-100"></div>
 
     <! –– exercise view ––>
-    <div id="exercise-view" class="hidden pt-6"></div>
-
-
+    <div id="exercise-view" class="d-none pt-6"></div>
 
     <! –– End of SuS possibilities ––>
 
-
     <! –– LP view  ––>
-    <div id="lp-view" class="view-container hidden h2">
+    <div id="lp-view" class="view-container d-none h2">
         <div class="LP-left1-panel scrollbar">
             <div id="lp-user-btn" class="cursor-pointer user-select-none d-flex position-sticky top-0 bg-light w-100 h4 p-3 border-bottom justify-content-center "></div>
             <div id="lp-classes" class="lp-user-info bg-light p-3 text-center"></div>
         </div>
+
         <div id="lp-students" class="LP-left2-panel scrollbar"></div>
-        <div class="LP-left4-panel">
-            <button id="new-unit">new Unit</button>
-        </div>
+        <div class="LP-left4-panel"><button id="new-unit">new Unit</button></div>
         <div id="lp-units" class="LP-left3-panel scrollbar"></div>
     </div>
 
+    <! –– edit units view  ––>
+    <div id="new-unit-view" class="view-container new-unit-view d-none">
 
-
-    <div id="new-unit-view" class="new-unit-view hidden">
-        <div class="task-editor overflow-auto vh-100 p-3 border">
-            <ul id="verb-list" class="verb-list">
-            </ul>
+        <div class="task-editor overflow-auto vh-100 p-3">
+            <ul id="verb-list" class="verb-list"></ul>
         </div>
+
         <div class="input-section">
+
             <input id="unit-name" type="text" placeholder="Name">
-            <textarea id="verb-input" placeholder=""></textarea>
-            <div class="button-group">
-                <input type="file" id="file-input" accept="application/pdf" multiple>
-                <button id="add-btn" class="add-btn">+</button>
-                <ul id="file-list"></ul>
+            <div class="verb-container">
+                <textarea id="verb-input" placeholder=""></textarea>
+                <div class="position-bottom-right">
+                    <input class="d-none" type="file" id="file-input" accept="application/pdf" multiple>
+                    <button id="add-file-btn" class="btn btn-dark">+</button>
+                    <button id="add-btn" class="btn btn-dark">↑</button>
+                </div>
             </div>
-            <select id="class-selection" multiple>
-            </select>
+
+            <ul id="file-list"></ul>
+            <select id="class-selection" multiple></select>
+
             <div class="action-buttons">
-                <button id="save-btn" class="create-btn">Speichern</button>
-                <button id="delete-btn" class="delete-btn">Löschen</button>
-                <button id="create-btn" class="create-btn">Erstellen</button>
-                <button id="home-btn" class="delete-btn">Home</button>
+                <button id="save-btn" class="btn btn-outline-dark">Speichern</button>
+                <button id="delete-btn" class="btn btn-outline-danger">Löschen</button>
+                <button id="create-btn" class="btn btn-outline-dark">Erstellen</button>
+                <button id="home-btn" class="btn btn-outline-danger">Home</button>
             </div>
         </div>
     </div>
+
     <script src="../static/script.js" defer></script>
 </body>
 </html>

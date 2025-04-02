@@ -46,9 +46,9 @@ def tenses():
     token = request.args.get('token')
     if token == '1':
         result = {
-            "Présent": False,
-            "Passé composé": False,
-            "Imparfait": False,
+            "Présent": True,
+            "Passé composé": True,
+            "Imparfait": True,
             "Plus-que-parfait": True,
             "Futur simple": True,
             "Conditionnel présent": True,
