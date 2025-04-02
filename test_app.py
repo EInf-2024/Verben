@@ -14,7 +14,7 @@ def login():
     password = request.args.get('password')
     return jsonify({"role": str(username), "token": 1})
 
-
+#g
 
 @app.route('/susview', methods=['GET'])  # ändern in JS
 def toSuS():
