@@ -37,28 +37,32 @@
     </div>
 
     <! –– tense selection view ––>
-    <div id="tense-selection-view" class="d-none view-container d-flex flex-column align-items-center justify-content-center vh-100"></div>
+    <div id="tense-selection-view" class="d-none view-container d-flex flex-column align-items-center justify-content-center vh-100">
+        <h2>Choisir les temps</h2>
+        <div id="form-check-field"></div>
+    </div>
 
     <! –– exercise view ––>
-    <div id="exercise-view" class="d-none pt-6"></div>
+    <div id="exercise-view" class="d-none d-flex"></div>
 
-    <! –– End of SuS possibilities ––>
+
+
 
     <! –– LP view  ––>
     <div id="lp-view" class="view-container d-none h2">
         <div class="LP-left1-panel scrollbar">
-            <div id="lp-user-btn" class="cursor-pointer user-select-none d-flex position-sticky top-0 bg-light w-100 h4 p-3 border-bottom justify-content-center "></div>
+            <div id="lp-user-btn" class="cursor-pointer user-select-none d-flex position-sticky top-0 bg-light w-100 p-3 border-bottom justify-content-center lp-username-text"></div>
             <div id="lp-classes" class="lp-user-info bg-light p-3 text-center"></div>
         </div>
-
         <div id="lp-students" class="LP-left2-panel scrollbar"></div>
         <div class="LP-left4-panel"><button id="new-unit">new Unit</button></div>
         <div id="lp-units" class="LP-left3-panel scrollbar"></div>
     </div>
 
-    <! –– edit units view  ––>
+    <!-- edit units view -->
     <div id="new-unit-view" class="view-container new-unit-view d-none">
 
+        <!-- list of verbs -->
         <div class="task-editor overflow-auto vh-100 p-3">
             <ul id="verb-list" class="verb-list"></ul>
         </div>
@@ -82,14 +86,11 @@
                 <input class="d-none" type="file" id="file-input" accept="application/pdf" multiple>
             </div>
 
-
-
-
             <div class="action-buttons d-flex justify-content-between align-items-start">
                 <!-- Left: Select Dropdown -->
                 <select id="class-selection" class="w-25" multiple></select>
 
-                <!-- Right: Buttons in a Vertical Column -->
+                <!-- Buttons in a Vertical Column -->
                 <div class="d-flex flex-column w-75">
                     <button id="save-btn" class="btn btn-outline-dark">Speichern</button>
                     <button id="delete-btn" class="btn btn-outline-danger">Löschen</button>

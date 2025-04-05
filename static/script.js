@@ -411,7 +411,7 @@ function susView (){
     fetch(`/susview?token=${encodeURIComponent(token)}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById("sus-left-panel").innerHTML = `<h2>${data.username}</h2>`
+            document.getElementById("sus-left-panel").innerHTML = `<h2 class="sus-username-text">${data.username}</h2>`
 
             for (const tense in data.progress) {
                 if (parseFloat(data.progress[tense]) != 0) {
@@ -442,10 +442,6 @@ function susView (){
 }
 
 
-
-
-
-
 document.getElementById("sus-right").addEventListener("click",function (event) {
     if (event.target.tagName === "DIV") {
         const objectId = event.target.getAttribute("data_id");
@@ -457,20 +453,18 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
         fetch(`/tenses?token=${encodeURIComponent(token)}`)
             .then(response => response.json())
             .then(data => {
-                document.getElementById("tense-selection-view").innerHTML=`<h2>Select French Tenses</h2>`
+                document.getElementById("form-check-field").innerHTML=``
                 for (const tense in data) {
                     if(data[tense]){
                         const tenseDiv = document.createElement('div');
-                        tenseDiv.classList.add('form-check');
                         tenseDiv.innerHTML=`
                           <input class="form-check-input" type="checkbox" name="tense" value="${tense}">
                           <label class="form-check-label" for="${tense}">${tense}</label>  
                         `
-                        document.getElementById("tense-selection-view").appendChild(tenseDiv)
+                        document.getElementById("form-check-field").appendChild(tenseDiv)
                     }
                 }
             })
-
         toTenses()
     }
 });
@@ -488,8 +482,13 @@ document.getElementById("start-training-button").addEventListener("click",functi
                 for (const sentence of data) {
                     const sentence_container = document.createElement('div');
                     sentence_container.classList.add('gap-sentence');
+                    sentence_container.innerHTML = `
+                    ${sentence.start} 
+                    <input type="text" class="gap-input" data-answer="${sentence.solution}" data-tense="${sentence.tense}">
+                    (${sentence.infinitive}) 
+                    ${sentence.end}
+                    `;
 
-                    sentence_container.innerHTML = `${sentence.start} <input type="text" class="gap-input" data-answer="${sentence.solution}" data-tense="${sentence.tense}">(${sentence.infinitive}) ${sentence.end}`;
                     sentence_container.setAttribute("solution", `${sentence.solution}`)
                     document.getElementById('exercise-view').appendChild(sentence_container);
 
@@ -523,8 +522,8 @@ document.getElementById("check-answers-button").addEventListener("click",functio
         const input = sentence.querySelector('.gap-input');
         const correctAnswer = input.getAttribute('data-answer');
         if (input.value === correctAnswer) {
-            sentence.querySelector('.gap-input').classList.add('green-text')
-            sentence.querySelector('.gap-input').classList.remove('red-text')
+            sentence.querySelector('.gap-input').classList.add('text-success')
+            sentence.querySelector('.gap-input').classList.remove('text-danger')
             if (button_clicks === "0"){
                 const tense = input.getAttribute('data-tense')
                 score[tense][1] += 1
@@ -535,8 +534,8 @@ document.getElementById("check-answers-button").addEventListener("click",functio
             // if it is the second,add the solution at the end of the sentence.
         }
         else{
-            sentence.querySelector('.gap-input').classList.add('red-text');
-            sentence.querySelector('.gap-input').classList.remove('green-text');
+            sentence.querySelector('.gap-input').classList.add('text-danger');
+            sentence.querySelector('.gap-input').classList.remove('text-success');
             if (button_clicks === "0"){
                 const tense = input.getAttribute('data-tense')
                 score[tense][1] += 1
@@ -551,30 +550,29 @@ document.getElementById("check-answers-button").addEventListener("click",functio
 
     });
 
-    if(
-        button_clicks === "0"
-    ){
+    if(button_clicks === "0"){
         fetch("/verify", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ score: score }) // Send the entire object
-    })
-    .then(response => {
-    if (!response.ok) {
-        console.error("Error:", response.statusText);
-    } else {
-        console.log("Score sent successfully");
-    }
-    })
-    .catch(error => console.error("Fetch error:", error));
-    }
-    const cp = cur_score[0] / cur_score[1]
-    document.getElementById('percentage').innerHTML = `${cp *100}%`
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json"
+            },
+                body: JSON.stringify({ score: score }) // Send the entire object
+            })
+        .then(response => {
+            if (!response.ok) {
+                console.error("Error:", response.statusText);
+            }
+            else {
+                console.log("Score sent successfully");
+            }
+            })
+        .catch(error => console.error("Fetch error:", error));
+        }
 
-    document.getElementById("check-answers-button").setAttribute("clicked",1)
+
+        const cp = cur_score[0] / cur_score[1]
+        document.getElementById('percentage').innerHTML = `${cp *100}%`
+        document.getElementById("check-answers-button").setAttribute("clicked",1)
 });
-
 
 document.getElementById("home-button").addEventListener("click",susView);

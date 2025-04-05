@@ -1,4 +1,4 @@
-/* Login View Styles */
+/* Main body styles */
 body {
     display: flex;
     justify-content: center;
@@ -9,13 +9,13 @@ body {
     overflow: hidden;
 }
 
+/* Style for all the main view container */
 .view-container{
     height: 100vh;
     width: 100%;
 }
 
-/* Main View Styles */
-
+/* Style for the SuS left panel */
 .left-panel {
     width: 20%;
     background-color: #f4f4f4;
@@ -28,20 +28,31 @@ body {
     padding: 4vh; /* Optional: Add some padding for spacing */
 }
 
+/* Style for the SuS right panel */
 .right-panel {
     width: 80%;
     margin-left: 20%;
     overflow-y: auto;
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Maximum 3 items per row */
-    gap: 20px; /* Even spacing between items */
+    gap: 2vw; /* Even spacing between items */
     justify-content: space-around; /* Center items within the container */
     align-content: start;
-    padding: 20px; /* Adds space around the items */
+    padding: 2vw; /* Adds space around the items */
     height: 100vh;
     background-color: #e0e0e0;
 }
 
+/* Username styles */
+.lp-username-text {
+    font-size: 1.7vw;
+}
+
+.sus-username-text {
+    font-size: 3vw;
+}
+
+/* Style for the different panels of the LP view */
 .LP-left1-panel {
     width: 10%;
     background-color: #f4f4f4;
@@ -50,7 +61,6 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
 }
-
 
 .LP-left2-panel {
     width: 15%;
@@ -67,10 +77,10 @@ body {
     overflow-y: auto;
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Maximum 3 items per row */
-    gap: 20px; /* Even spacing between items */
+    gap: 2vw; /* Even spacing between items */
     justify-content: space-around; /* Center items within the container */
     align-content: start;
-    padding: 20px; /* Adds space around the items */
+    padding: 2vw; /* Adds space around the items */
     height: 100vh;
     background-color: #f4f4f4;
 }
@@ -95,6 +105,7 @@ body {
 }
 
 
+/* style for the classes and SuS in LP view */
 .class-circle {
     width: 7vw;
     height: 7vw;
@@ -111,12 +122,13 @@ body {
 }
 
 
+/* Style for a unit field */
 .unit-field {
     background-color: #242427;
     font-size: 3vw;
     color: white;
-    width: 22vw;  /* 1/5th of the viewport width */
-    height: 22vw; /* Ensures it's a square */
+    width: 100%;  /* Automatically take the full width of the grid cell */
+    aspect-ratio: 5 / 3; /* Keeps the height proportional */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -125,98 +137,28 @@ body {
     cursor: pointer;
 }
 
+
 .unit-field:hover {
     background-color: #414145;
 }
 
-/* Tense Selection Container Styling */
-
-
-h2 {
-    text-align: center;
-    color: #333;
-}
-
-.tense {
-    margin: 10px 0;
-}
-
-.tense input[type="checkbox"] {
-    margin-right: 10px;
-}
-
-.tense label {
-    font-size: 16px;
-    color: #555;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
 
 /* Training styles */
-
-
-#gap-text-container {
-    width: 50%;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #f4f4f4;
-    border-radius: 8px;
-    text-align: center;
-}
-
-h2 {
-    color: #333;
-}
-
 .gap-sentence {
-    margin: 10px 0;
-    font-size: 18px;
+    margin: 0.5vw;
+    font-size: 1.4vw;
 }
 
 .gap-input {
-    width: 100px;
+    width: 10vw;
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px #242427;
     border-radius: 5px;
     text-align: center;
 }
 
-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
 
-button:hover {
-    background-color: #0056b3;
-}
-
-#result-message {
-    margin-top: 15px;
-    font-weight: bold;
-}
-
-
-
-.green-text {
-    color: green;
-}
-
-.red-text {
-    color: red;
-}
-
-
+/* Styles for the new/edit unit view */
 .new-unit-view{
     display: flex;
     justify-content: space-between;
@@ -264,8 +206,6 @@ textarea {
     height: 50vh;
 }
 
-
-
 /* Keep space at the bottom for buttons */
 #verb-input {
     width: 100%;
@@ -281,6 +221,7 @@ textarea {
     border-bottom: 3px solid #242427;
     border-right: 3px solid #242427;
     border-left: 3px solid #242427;
+    border-radius: 5px;
     width: 100%;
     height: 40px;
     display: flex;
@@ -289,7 +230,6 @@ textarea {
     padding: 20px;
     box-sizing: border-box; /* Prevents overflow */
 }
-
 
 .action-buttons {
     display: flex;
