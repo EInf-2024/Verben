@@ -95,7 +95,8 @@ function lpView(){
     document.querySelector('.LP-left3-panel').style.width = '82%'
     document.getElementById('lp-students').classList.add('d-none')
 
-
+    document.getElementById('lp-sus-progress').classList.add('d-none')
+    document.getElementById('lp-units').classList.remove('d-none')
 
 
     fetch(`/lpview?token=${encodeURIComponent(token)}`)
@@ -133,6 +134,9 @@ function lpView(){
 
 document.getElementById("lp-classes").addEventListener("click",function (event) {
     if (event.target.tagName === "P") {
+        document.getElementById('lp-sus-progress').classList.add('d-none')
+        document.getElementById('lp-units').classList.remove('d-none')
+
         const classId = event.target.getAttribute("data_id");
         document.querySelector('.LP-left3-panel').style.marginLeft = '25%'
         document.querySelector('.LP-left3-panel').style.width = '67%'
@@ -167,27 +171,32 @@ document.getElementById("lp-classes").addEventListener("click",function (event) 
 
 document.getElementById("lp-students").addEventListener("click",function (event) {
     if (event.target.tagName === "P") {
+        document.getElementById('lp-sus-progress').classList.remove('d-none')
+        document.getElementById('lp-units').classList.add('d-none')
+
         const studentId = event.target.getAttribute("data_id");
         document.getElementById('lp-students').classList.remove('d-none')
         fetch(`/susview?token=${encodeURIComponent(studentId)}`)
             .then(response => response.json())
             .then(data => {
-                const lpInfoContainer = document.getElementById('lp-units');
+                const lpInfoContainer = document.getElementById('lp-sus-progress');
                 lpInfoContainer.innerHTML = `${data.username}`
                 for (const tense in data.progress) {
                     const progressContainer = document.createElement('p');
                     progressContainer.id = 'progress-container';
-                    if (data.progress.hasOwnProperty(tense)) {
                         progressContainer.innerHTML = `
-                        ${tense} <progress id="progress-bar" value="${data.progress[tense]}" max="1"></progress>`;
-                    }
+                            <div class="progress position-relative" style="width: 18vw; height: 2vw;">
+                                <div class="progress-bar bg-info text-dark" role="progressbar" style="width: ${parseFloat(data.progress[tense])*100}%;"></div>
+                                <span class="position-absolute w-100 text-center" style="font-size: 1.2vw; top: 50%; transform: translateY(-50%);">${tense}</span>
+                            </div>
+                        `;
                     lpInfoContainer.appendChild(progressContainer);
                 }
             })
     }
 });
 
-
+/* redundant?*/
 document.getElementById("new-unit").addEventListener("click",function(){
     document.getElementById('save-btn').classList.add('d-none')
     document.getElementById('delete-btn').classList.add('d-none')
@@ -214,9 +223,6 @@ document.getElementById('delete-btn').addEventListener('click',function(){
     })
     .catch(error => console.error("Fetch error:", error));
     lpView()
-
-
-
 
 });
 
@@ -321,8 +327,10 @@ document.getElementById('create-btn').addEventListener('click',function(){
 
 document.getElementById("lp-units").addEventListener("click",function (event) {
     if (event.target.tagName === "DIV") {
-        const objectId = event.target.getAttribute("data_id");
+        document.getElementById('lp-sus-progress').classList.add('d-none')
+        document.getElementById('lp-units').classList.remove('d-none')
 
+        const objectId = event.target.getAttribute("data_id");
         fetch(`/getunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(objectId)}`)
             .then(response => response.json())
             .then(data => {
@@ -443,6 +451,7 @@ function susView (){
 
 
 document.getElementById("sus-right").addEventListener("click",function (event) {
+    document.getElementById('start-training-button').classList.remove('d-none')
     if (event.target.tagName === "DIV") {
         const objectId = event.target.getAttribute("data_id");
         const objectName = event.target.textContent
@@ -472,6 +481,7 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
 
 
 document.getElementById("start-training-button").addEventListener("click",function (){
+    document.getElementById('start-training-button').classList.add('d-none')
     const selectedTenses = [...document.querySelectorAll('input[name="tense"]:checked')]
         .map(checkbox => checkbox.value);
     const selected_unit = document.getElementById('navbar').getAttribute('selected_unit')

@@ -76,13 +76,26 @@ body {
     margin-left: 25%;
     overflow-y: auto;
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Maximum 3 items per row */
-    gap: 2vw; /* Even spacing between items */
+    grid-template-columns: repeat(4, 1fr); /* Maximum 3 items per row */
+    gap: 1.3vw; /* Even spacing between items */
     justify-content: space-around; /* Center items within the container */
     align-content: start;
     padding: 2vw; /* Adds space around the items */
     height: 100vh;
     background-color: #f4f4f4;
+}
+
+.LP-left5-panel{
+    width: 67%;
+    margin-left: 25%;
+    background-color: #f4f4f4;
+    position: fixed;
+    height: 100vh;
+    display: flex;
+    flex-direction: column; /* Arrange items in a vertical stack */
+    justify-content: center; /* Align items to the top */
+    align-items: center; /* Center items horizontally */
+    padding: 4vh; /* Optional: Add some padding for spacing */
 }
 
 .LP-left4-panel {
@@ -119,6 +132,16 @@ body {
     height: 4vw;
     font-weight: bold;
     font-size: 2vw;
+    margin: clamp(5px, .3vw, .3rem);
+    border-radius: 3%;
+
+}
+
+/* Styles for the new unit button to make it square */
+.square-btn {
+  aspect-ratio: 1 / 1;
+  margin: clamp(1px, .2vw, .3vw);
+  font-size: 2rem;
 }
 
 
@@ -141,20 +164,46 @@ body {
 .unit-field:hover {
     background-color: #414145;
 }
+/* Styles for tense selection view  */
+.responsive-text {
+  font-size: clamp(1rem, 1.2vw, 3rem); /* Responsive size based on viewport width */
+}
 
 
 /* Training styles */
 .gap-sentence {
     margin: 0.5vw;
-    font-size: 1.4vw;
+    font-size: clamp(7px, 4vw, 20px);
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: normal;
 }
 
+.gap-sentence p {
+    margin: 0;
+    display: inline; /* Makes <p> behave like inline text */
+}
+
+
 .gap-input {
-    width: 10vw;
-    padding: 5px;
-    border: 1px #242427;
-    border-radius: 5px;
+    width: auto;
+    min-width: 3ch; /* Optional: Prevents it from getting too narrow */
+    height: auto;
+    padding: 2px 4px;
+    border: none;
+    border-bottom: 2px solid rgba(145, 145, 145, 0.7);
+    border-radius: 0;
+    outline: none;
     text-align: center;
+    font-size: inherit; /* Matches surrounding text */
+    line-height: inherit; /* Aligns better with surrounding text */
+    vertical-align: baseline; /* Keeps it aligned with inline text */
+}
+
+input:focus {
+  border-bottom: 2px solid rgb(73, 73, 73); /* Darker border on focus */
 }
 
 
@@ -174,6 +223,10 @@ body {
     width: 55%;
     border-right: 2px solid #ccc;
     padding-right: 20px;
+}
+
+.class-selection{
+    width: clamp(80px, 25%, 25%);
 }
 
 .verb-list {
