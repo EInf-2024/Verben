@@ -1,7 +1,16 @@
-from flask import Flask, jsonify,request, render_template
+from flask import Flask, request, jsonify, render_template
+import os
+from dotenv import load_dotenv
+import openai
+from config import get_connection
+import mysql.connector
+from pydantic import BaseModel
+from typing import List, Dict
 
 app = Flask(__name__)
-
+load_dotenv()  # Lädt Variablen aus der .env-Datei
+openai.api_key = os.getenv("OPENAI_API_KEY")
+client = openai.OpenAI()
 
 @app.route('/')
 def index():
@@ -12,7 +21,36 @@ def index():
 def login():
     username = request.args.get('username')
     password = request.args.get('password')
-    return jsonify({"role": str(username), "token": 1})
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        # Erst Student prüfen
+        query_student = "SELECT id FROM mf_student WHERE username = %s AND password = %s"
+        cursor.execute(query_student, (username, password))
+        student = cursor.fetchone()
+        if student:
+            cursor.close()
+            connection.close()
+            return jsonify({"role": "sus", "id": student["id"]})
+
+        # Dann Lehrer prüfen
+        query_teacher = "SELECT id FROM mf_teacher WHERE username = %s AND password = %s"
+        cursor.execute(query_teacher, (username, password))
+        teacher = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        if teacher:
+            return jsonify({"role": "lp", "id": teacher["id"]})
+        else:
+            return jsonify({"error": "Ungültiger Login"}), 401
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
 
 #gugugug
 
