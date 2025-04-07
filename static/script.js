@@ -65,7 +65,7 @@ function login (){
     const username = document.getElementById('input-name').value
     const password = document.getElementById('input-password').value
 
-    fetch(`http://127.0.0.1:5000/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`)
+    fetch(`/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`)
         .then(response => response.json())
         .then(data => {
             token = data.token
@@ -95,10 +95,11 @@ function lpView(){
     document.querySelector('.LP-left3-panel').style.width = '82%'
     document.getElementById('lp-students').classList.add('d-none')
 
+    document.getElementById('lp-sus-progress').classList.add('d-none')
+    document.getElementById('lp-units').classList.remove('d-none')
 
 
-
-    fetch(`http://127.0.0.1:5000/lpview?token=${encodeURIComponent(token)}`)
+    fetch(`/lpview?token=${encodeURIComponent(token)}`)
         .then(response => response.json())
         .then(data => {
             document.getElementById('lp-user-btn').textContent = data.username
@@ -133,13 +134,16 @@ function lpView(){
 
 document.getElementById("lp-classes").addEventListener("click",function (event) {
     if (event.target.tagName === "P") {
+        document.getElementById('lp-sus-progress').classList.add('d-none')
+        document.getElementById('lp-units').classList.remove('d-none')
+
         const classId = event.target.getAttribute("data_id");
         document.querySelector('.LP-left3-panel').style.marginLeft = '25%'
         document.querySelector('.LP-left3-panel').style.width = '67%'
         document.getElementById('lp-students').classList.remove('d-none')
 
 
-        fetch(`http://127.0.0.1:5000/lpclass?token=${encodeURIComponent(token)}&class_id=${encodeURIComponent(classId)}`)
+        fetch(`/lpclass?token=${encodeURIComponent(token)}&class_id=${encodeURIComponent(classId)}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('lp-units').innerHTML=``
@@ -167,27 +171,32 @@ document.getElementById("lp-classes").addEventListener("click",function (event) 
 
 document.getElementById("lp-students").addEventListener("click",function (event) {
     if (event.target.tagName === "P") {
+        document.getElementById('lp-sus-progress').classList.remove('d-none')
+        document.getElementById('lp-units').classList.add('d-none')
+
         const studentId = event.target.getAttribute("data_id");
         document.getElementById('lp-students').classList.remove('d-none')
-        fetch(`http://127.0.0.1:5000/susview?token=${encodeURIComponent(studentId)}`)
+        fetch(`/susview?token=${encodeURIComponent(studentId)}`)
             .then(response => response.json())
             .then(data => {
-                const lpInfoContainer = document.getElementById('lp-units');
+                const lpInfoContainer = document.getElementById('lp-sus-progress');
                 lpInfoContainer.innerHTML = `${data.username}`
                 for (const tense in data.progress) {
                     const progressContainer = document.createElement('p');
                     progressContainer.id = 'progress-container';
-                    if (data.progress.hasOwnProperty(tense)) {
                         progressContainer.innerHTML = `
-                        ${tense} <progress id="progress-bar" value="${data.progress[tense]}" max="1"></progress>`;
-                    }
+                            <div class="progress position-relative" style="width: 18vw; height: 2vw;">
+                                <div class="progress-bar bg-info text-dark" role="progressbar" style="width: ${parseFloat(data.progress[tense])*100}%;"></div>
+                                <span class="position-absolute w-100 text-center" style="font-size: 1.2vw; top: 50%; transform: translateY(-50%);">${tense}</span>
+                            </div>
+                        `;
                     lpInfoContainer.appendChild(progressContainer);
                 }
             })
     }
 });
 
-
+/* redundant?*/
 document.getElementById("new-unit").addEventListener("click",function(){
     document.getElementById('save-btn').classList.add('d-none')
     document.getElementById('delete-btn').classList.add('d-none')
@@ -202,7 +211,7 @@ document.getElementById("home-btn").addEventListener("click", function (){
 
 document.getElementById('delete-btn').addEventListener('click',function(){
     const unit_id = document.getElementById('unit-name').getAttribute('data_id')
-    fetch(`http://127.0.0.1:5000/deleteunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(unit_id)}`)
+    fetch(`/deleteunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(unit_id)}`)
     .then(response => {
         if (!response.ok) {
             throw new Error(`Error: ${response.status} - ${response.statusText}`);
@@ -215,14 +224,10 @@ document.getElementById('delete-btn').addEventListener('click',function(){
     .catch(error => console.error("Fetch error:", error));
     lpView()
 
-
-
-
 });
 
 
 // pdf file upload
-
 
 document.getElementById("add-file-btn").addEventListener("click", () => {
     document.getElementById("file-input").click();
@@ -255,7 +260,7 @@ document.getElementById('add-btn').addEventListener('click', function() {
     formData.append("text", document.getElementById("verb-input").value);
 
     //  Send request (even if no files, but always with text)
-    fetch('http://127.0.0.1:5000/upload', {
+    fetch('/upload', {
         method: 'POST',
         body: formData
     })
@@ -268,6 +273,7 @@ document.getElementById('add-btn').addEventListener('click', function() {
             const verb_container = document.createElement('li');
             verb_container.innerHTML = `✖${data.verbs[verb]}`
             verb_container.setAttribute('data_id',`${verb}`)
+            verb_container.classList.add("d-flex", "align-items-center", "justify-content-center","cursor-pointer","user-select-none")
             document.getElementById('verb-list').appendChild(verb_container)
         }
 
@@ -301,7 +307,7 @@ document.getElementById('create-btn').addEventListener('click',function(){
         'verbs': verbs,
     }
 
-    fetch("http://127.0.0.1:5000/createunit", {
+    fetch("/createunit", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ unit: unit }) // Send the entire object
@@ -321,9 +327,11 @@ document.getElementById('create-btn').addEventListener('click',function(){
 
 document.getElementById("lp-units").addEventListener("click",function (event) {
     if (event.target.tagName === "DIV") {
-        const objectId = event.target.getAttribute("data_id");
+        document.getElementById('lp-sus-progress').classList.add('d-none')
+        document.getElementById('lp-units').classList.remove('d-none')
 
-        fetch(`http://127.0.0.1:5000/getunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(objectId)}`)
+        const objectId = event.target.getAttribute("data_id");
+        fetch(`/getunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(objectId)}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('unit-name').value = data.unit_name
@@ -339,6 +347,7 @@ document.getElementById("lp-units").addEventListener("click",function (event) {
                     const verb_container = document.createElement('li');
                     verb_container.innerHTML = `✖${data.verbs[verb]}`
                     verb_container.setAttribute('data_id',`${verb}`)
+                    verb_container.classList.add("d-flex", "align-items-center", "justify-content-center","cursor-pointer","user-select-none")
                     document.getElementById('verb-list').appendChild(verb_container)
                 }
 
@@ -374,7 +383,7 @@ document.getElementById('save-btn').addEventListener('click',function(){
     }
     console.log(unit)
 
-    fetch("http://127.0.0.1:5000/saveunit", {
+    fetch("/saveunit", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ unit: unit }) // Send the entire object
@@ -407,10 +416,10 @@ document.getElementById("verb-list").addEventListener("click", function (event) 
 function susView (){
     toSuS()
     document.getElementById('percentage').innerHTML=''
-    fetch(`http://127.0.0.1:5000/susview?token=${encodeURIComponent(token)}`)
+    fetch(`/susview?token=${encodeURIComponent(token)}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById("sus-left-panel").innerHTML = `<h2>${data.username}</h2>`
+            document.getElementById("sus-left-panel").innerHTML = `<h2 class="sus-username-text">${data.username}</h2>`
 
             for (const tense in data.progress) {
                 if (parseFloat(data.progress[tense]) != 0) {
@@ -441,11 +450,8 @@ function susView (){
 }
 
 
-
-
-
-
 document.getElementById("sus-right").addEventListener("click",function (event) {
+    document.getElementById('start-training-button').classList.remove('d-none')
     if (event.target.tagName === "DIV") {
         const objectId = event.target.getAttribute("data_id");
         const objectName = event.target.textContent
@@ -453,23 +459,21 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
         navbar.textContent = `${objectName}`
         document.getElementById('navbar').setAttribute("selected_unit",`${objectId}`)
 
-        fetch(`http://127.0.0.1:5000/tenses?token=${encodeURIComponent(token)}`)
+        fetch(`/tenses?token=${encodeURIComponent(token)}`)
             .then(response => response.json())
             .then(data => {
-                document.getElementById("tense-selection-view").innerHTML=`<h2>Select French Tenses</h2>`
+                document.getElementById("form-check-field").innerHTML=``
                 for (const tense in data) {
                     if(data[tense]){
                         const tenseDiv = document.createElement('div');
-                        tenseDiv.classList.add('form-check');
                         tenseDiv.innerHTML=`
                           <input class="form-check-input" type="checkbox" name="tense" value="${tense}">
                           <label class="form-check-label" for="${tense}">${tense}</label>  
                         `
-                        document.getElementById("tense-selection-view").appendChild(tenseDiv)
+                        document.getElementById("form-check-field").appendChild(tenseDiv)
                     }
                 }
             })
-
         toTenses()
     }
 });
@@ -477,18 +481,24 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
 
 
 document.getElementById("start-training-button").addEventListener("click",function (){
+    document.getElementById('start-training-button').classList.add('d-none')
     const selectedTenses = [...document.querySelectorAll('input[name="tense"]:checked')]
         .map(checkbox => checkbox.value);
     const selected_unit = document.getElementById('navbar').getAttribute('selected_unit')
-    fetch(`http://127.0.0.1:5000/training?token=${encodeURIComponent(token)}&tenses=${encodeURIComponent(selectedTenses.join(','))}&unit=${encodeURIComponent(selected_unit)}`)
+    fetch(`/training?token=${encodeURIComponent(token)}&tenses=${encodeURIComponent(selectedTenses.join(','))}&unit=${encodeURIComponent(selected_unit)}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('exercise-view').innerHTML = ``
                 for (const sentence of data) {
                     const sentence_container = document.createElement('div');
                     sentence_container.classList.add('gap-sentence');
+                    sentence_container.innerHTML = `
+                    ${sentence.start} 
+                    <input type="text" class="gap-input" data-answer="${sentence.solution}" data-tense="${sentence.tense}">
+                    (${sentence.infinitive}) 
+                    ${sentence.end}
+                    `;
 
-                    sentence_container.innerHTML = `${sentence.start} <input type="text" class="gap-input" data-answer="${sentence.solution}" data-tense="${sentence.tense}">(${sentence.infinitive}) ${sentence.end}`;
                     sentence_container.setAttribute("solution", `${sentence.solution}`)
                     document.getElementById('exercise-view').appendChild(sentence_container);
 
@@ -522,8 +532,8 @@ document.getElementById("check-answers-button").addEventListener("click",functio
         const input = sentence.querySelector('.gap-input');
         const correctAnswer = input.getAttribute('data-answer');
         if (input.value === correctAnswer) {
-            sentence.querySelector('.gap-input').classList.add('green-text')
-            sentence.querySelector('.gap-input').classList.remove('red-text')
+            sentence.querySelector('.gap-input').classList.add('text-success')
+            sentence.querySelector('.gap-input').classList.remove('text-danger')
             if (button_clicks === "0"){
                 const tense = input.getAttribute('data-tense')
                 score[tense][1] += 1
@@ -534,8 +544,8 @@ document.getElementById("check-answers-button").addEventListener("click",functio
             // if it is the second,add the solution at the end of the sentence.
         }
         else{
-            sentence.querySelector('.gap-input').classList.add('red-text');
-            sentence.querySelector('.gap-input').classList.remove('green-text');
+            sentence.querySelector('.gap-input').classList.add('text-danger');
+            sentence.querySelector('.gap-input').classList.remove('text-success');
             if (button_clicks === "0"){
                 const tense = input.getAttribute('data-tense')
                 score[tense][1] += 1
@@ -550,34 +560,29 @@ document.getElementById("check-answers-button").addEventListener("click",functio
 
     });
 
-    if(
-        button_clicks === "0"
-    ){
-        fetch("http://127.0.0.1:5000/verify", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ score: score }) // Send the entire object
-    })
-    .then(response => {
-    if (!response.ok) {
-        console.error("Error:", response.statusText);
-    } else {
-        console.log("Score sent successfully");
-    }
-    })
-    .catch(error => console.error("Fetch error:", error));
-    }
-    const cp = cur_score[0] / cur_score[1]
-    document.getElementById('percentage').innerHTML = `${cp *100}%`
+    if(button_clicks === "0"){
+        fetch("/verify", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json"
+            },
+                body: JSON.stringify({ score: score }) // Send the entire object
+            })
+        .then(response => {
+            if (!response.ok) {
+                console.error("Error:", response.statusText);
+            }
+            else {
+                console.log("Score sent successfully");
+            }
+            })
+        .catch(error => console.error("Fetch error:", error));
+        }
 
-    document.getElementById("check-answers-button").setAttribute("clicked",1)
+
+        const cp = cur_score[0] / cur_score[1]
+        document.getElementById('percentage').innerHTML = `${cp *100}%`
+        document.getElementById("check-answers-button").setAttribute("clicked",1)
 });
 
-
 document.getElementById("home-button").addEventListener("click",susView);
-
-
-
-

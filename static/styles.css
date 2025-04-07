@@ -1,4 +1,4 @@
-/* Login View Styles */
+/* Main body styles */
 body {
     display: flex;
     justify-content: center;
@@ -9,13 +9,13 @@ body {
     overflow: hidden;
 }
 
+/* Style for all the main view container */
 .view-container{
     height: 100vh;
     width: 100%;
 }
 
-/* Main View Styles */
-
+/* Style for the SuS left panel */
 .left-panel {
     width: 20%;
     background-color: #f4f4f4;
@@ -28,20 +28,31 @@ body {
     padding: 4vh; /* Optional: Add some padding for spacing */
 }
 
+/* Style for the SuS right panel */
 .right-panel {
     width: 80%;
     margin-left: 20%;
     overflow-y: auto;
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Maximum 3 items per row */
-    gap: 20px; /* Even spacing between items */
+    gap: 2vw; /* Even spacing between items */
     justify-content: space-around; /* Center items within the container */
     align-content: start;
-    padding: 20px; /* Adds space around the items */
+    padding: 2vw; /* Adds space around the items */
     height: 100vh;
     background-color: #e0e0e0;
 }
 
+/* Username styles */
+.lp-username-text {
+    font-size: 1.7vw;
+}
+
+.sus-username-text {
+    font-size: 3vw;
+}
+
+/* Style for the different panels of the LP view */
 .LP-left1-panel {
     width: 10%;
     background-color: #f4f4f4;
@@ -50,7 +61,6 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
 }
-
 
 .LP-left2-panel {
     width: 15%;
@@ -66,13 +76,26 @@ body {
     margin-left: 25%;
     overflow-y: auto;
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Maximum 3 items per row */
-    gap: 20px; /* Even spacing between items */
+    grid-template-columns: repeat(4, 1fr); /* Maximum 3 items per row */
+    gap: 1.3vw; /* Even spacing between items */
     justify-content: space-around; /* Center items within the container */
     align-content: start;
-    padding: 20px; /* Adds space around the items */
+    padding: 2vw; /* Adds space around the items */
     height: 100vh;
     background-color: #f4f4f4;
+}
+
+.LP-left5-panel{
+    width: 67%;
+    margin-left: 25%;
+    background-color: #f4f4f4;
+    position: fixed;
+    height: 100vh;
+    display: flex;
+    flex-direction: column; /* Arrange items in a vertical stack */
+    justify-content: center; /* Align items to the top */
+    align-items: center; /* Center items horizontally */
+    padding: 4vh; /* Optional: Add some padding for spacing */
 }
 
 .LP-left4-panel {
@@ -95,6 +118,7 @@ body {
 }
 
 
+/* style for the classes and SuS in LP view */
 .class-circle {
     width: 7vw;
     height: 7vw;
@@ -108,15 +132,26 @@ body {
     height: 4vw;
     font-weight: bold;
     font-size: 2vw;
+    margin: clamp(5px, .3vw, .3rem);
+    border-radius: 3%;
+
+}
+
+/* Styles for the new unit button to make it square */
+.square-btn {
+  aspect-ratio: 1 / 1;
+  margin: clamp(1px, .2vw, .3vw);
+  font-size: 2rem;
 }
 
 
+/* Style for a unit field */
 .unit-field {
     background-color: #242427;
     font-size: 3vw;
     color: white;
-    width: 22vw;  /* 1/5th of the viewport width */
-    height: 22vw; /* Ensures it's a square */
+    width: 100%;  /* Automatically take the full width of the grid cell */
+    aspect-ratio: 5 / 3; /* Keeps the height proportional */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -125,98 +160,54 @@ body {
     cursor: pointer;
 }
 
+
 .unit-field:hover {
     background-color: #414145;
 }
-
-/* Tense Selection Container Styling */
-
-
-h2 {
-    text-align: center;
-    color: #333;
-}
-
-.tense {
-    margin: 10px 0;
-}
-
-.tense input[type="checkbox"] {
-    margin-right: 10px;
-}
-
-.tense label {
-    font-size: 16px;
-    color: #555;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+/* Styles for tense selection view  */
+.responsive-text {
+  font-size: clamp(1rem, 1.2vw, 3rem); /* Responsive size based on viewport width */
 }
 
 
 /* Training styles */
-
-
-#gap-text-container {
-    width: 50%;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #f4f4f4;
-    border-radius: 8px;
-    text-align: center;
-}
-
-h2 {
-    color: #333;
-}
-
 .gap-sentence {
-    margin: 10px 0;
-    font-size: 18px;
+    margin: 0.5vw;
+    font-size: clamp(7px, 4vw, 20px);
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: normal;
 }
+
+.gap-sentence p {
+    margin: 0;
+    display: inline; /* Makes <p> behave like inline text */
+}
+
 
 .gap-input {
-    width: 100px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    text-align: center;
-}
-
-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
+    width: auto;
+    min-width: 3ch; /* Optional: Prevents it from getting too narrow */
+    height: auto;
+    padding: 2px 4px;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    border-bottom: 2px solid rgba(145, 145, 145, 0.7);
+    border-radius: 0;
+    outline: none;
+    text-align: center;
+    font-size: inherit; /* Matches surrounding text */
+    line-height: inherit; /* Aligns better with surrounding text */
+    vertical-align: baseline; /* Keeps it aligned with inline text */
 }
 
-button:hover {
-    background-color: #0056b3;
-}
-
-#result-message {
-    margin-top: 15px;
-    font-weight: bold;
-}
-
-
-
-.green-text {
-    color: green;
-}
-
-.red-text {
-    color: red;
+input:focus {
+  border-bottom: 2px solid rgb(73, 73, 73); /* Darker border on focus */
 }
 
 
+/* Styles for the new/edit unit view */
 .new-unit-view{
     display: flex;
     justify-content: space-between;
@@ -232,6 +223,10 @@ button:hover {
     width: 55%;
     border-right: 2px solid #ccc;
     padding-right: 20px;
+}
+
+.class-selection{
+    width: clamp(80px, 25%, 25%);
 }
 
 .verb-list {
@@ -261,28 +256,33 @@ input, textarea, select {
 }
 
 textarea {
-    height: 40vh;
+    height: 50vh;
 }
 
-
-.position-bottom-right {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-}
-.verb-container {
-    position: relative; /* Allows absolute positioning inside */
-    width: 100%;
-}
+/* Keep space at the bottom for buttons */
 #verb-input {
     width: 100%;
-    padding-bottom: 40px; /* Prevents text from overlapping buttons */
+    resize: none;
+    position: relative;
+    padding-bottom: 50px; /* Ensures text doesn’t overlap buttons */
 }
 
-
-
-
-
+/* Bottom bar inside the textarea */
+.bar-background {
+    background: white; /* Solid background */
+    position: fixed;
+    border-bottom: 3px solid #242427;
+    border-right: 3px solid #242427;
+    border-left: 3px solid #242427;
+    border-radius: 5px;
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    box-sizing: border-box; /* Prevents overflow */
+}
 
 .action-buttons {
     display: flex;

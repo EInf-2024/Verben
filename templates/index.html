@@ -14,8 +14,8 @@
     <header id="navbar" class="d-none d-flex flex-row justify-content-center align-items-center fixed-top bg-white px-3 py-2 w-100 gap-5">
         <button id="home-button" class="btn btn-info w-auto">Home</button>
         <p id="nav-unit-name" class="mb-0"></p>
-        <button id="start-training-button" class="btn btn-success w-auto">Start Training</button>
-        <button id="check-answers-button" class="btn btn-info w-auto">Vérifier les réponses</button>
+        <button id="start-training-button" class="btn btn-success w-auto d-none">Commencer l'exercice</button>
+        <button id="check-answers-button" class="btn btn-success w-auto">Vérifier les réponses</button>
         <p id="percentage" class="mb-0"></p>
     </header>
 
@@ -24,9 +24,9 @@
     <div id="login-view" class="container d-flex justify-content-center align-items-center vh-100">
         <div class="card p-4 shadow-lg" style="width: 350px;">
             <h2 class="text-center mb-4">Login</h2>
-            <input id="input-name" type="text" class="form-control mb-3" placeholder="Name">
-            <input id="input-password" type="password" class="form-control mb-3" placeholder="Password">
-            <button id="login-button" class="btn btn-dark w-100">Log In</button>
+            <input id="input-name" type="text" class="form-control mb-3" placeholder="Nom">
+            <input id="input-password" type="password" class="form-control mb-3" placeholder="Mot de passe">
+            <button id="login-button" class="btn btn-dark w-100">Se connecter</button>
         </div>
     </div>
 
@@ -37,53 +37,71 @@
     </div>
 
     <! –– tense selection view ––>
-    <div id="tense-selection-view" class="d-none view-container d-flex flex-column align-items-center justify-content-center vh-100"></div>
+    <div id="tense-selection-view" class="d-none responsive-text view-container d-flex flex-column align-items-center justify-content-center vh-100">
+        <h2>Choisir les temps</h2>
+        <div id="form-check-field" class="pt-5"></div>
+    </div>
 
     <! –– exercise view ––>
-    <div id="exercise-view" class="d-none pt-6"></div>
+    <div id="exercise-view" class="d-none d-flex flex-column gap-3"></div>
 
-    <! –– End of SuS possibilities ––>
+
+
 
     <! –– LP view  ––>
     <div id="lp-view" class="view-container d-none h2">
+
         <div class="LP-left1-panel scrollbar">
-            <div id="lp-user-btn" class="cursor-pointer user-select-none d-flex position-sticky top-0 bg-light w-100 h4 p-3 border-bottom justify-content-center "></div>
-            <div id="lp-classes" class="lp-user-info bg-light p-3 text-center"></div>
+            <div id="lp-user-btn" class="cursor-pointer user-select-none d-flex position-sticky top-0 bg-light w-100 p-3 border-bottom justify-content-center lp-username-text"></div>
+            <div id="lp-classes" class="lp-user-info bg-light p-3 text-center d-flex flex-column align-items-center"></div>
         </div>
 
         <div id="lp-students" class="LP-left2-panel scrollbar"></div>
-        <div class="LP-left4-panel"><button id="new-unit">new Unit</button></div>
+        <div class="LP-left4-panel p-3"><button id="new-unit" class="btn btn-dark w-100 square-btn">Nouvelle unité</button></div>
         <div id="lp-units" class="LP-left3-panel scrollbar"></div>
+        <div id="lp-sus-progress" class="LP-left5-panel scrollbar d-none"></div>
     </div>
 
-    <! –– edit units view  ––>
+    <!-- edit units view -->
     <div id="new-unit-view" class="view-container new-unit-view d-none">
 
+        <!-- list of verbs -->
         <div class="task-editor overflow-auto vh-100 p-3">
             <ul id="verb-list" class="verb-list"></ul>
         </div>
 
         <div class="input-section">
 
-            <input id="unit-name" type="text" placeholder="Name">
-            <div class="verb-container">
-                <textarea id="verb-input" placeholder=""></textarea>
-                <div class="position-bottom-right">
-                    <input class="d-none" type="file" id="file-input" accept="application/pdf" multiple>
-                    <button id="add-file-btn" class="btn btn-dark">+</button>
-                    <button id="add-btn" class="btn btn-dark">↑</button>
+            <input id="unit-name" type="text" placeholder="Nom">
+
+            <div class="verb-container position-relative">
+                <textarea id="verb-input" class="form-control border border-3 border-dark shadow-none" placeholder="Saisissez un texte à partir duquel les verbes doivent être filtrés."></textarea>
+
+                <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-between align-items-center p-2 bar-background">
+                    <div class="d-flex align-items-center">
+                        <button id="add-file-btn" class="btn btn-dark btn-sm">+</button>
+                        <ul id="file-list" class="list-unstyled mb-0 ms-2"></ul>
+                    </div>
+                    <button id="add-btn" class="btn btn-dark btn-sm">↑</button>
+                </div>
+
+                <!-- Hidden file input -->
+                <input class="d-none" type="file" id="file-input" accept="application/pdf" multiple>
+            </div>
+
+            <div class="action-buttons d-flex justify-content-between align-items-center">
+                <!-- Left: Select Dropdown -->
+                <select id="class-selection" class="class-selection" multiple></select>
+
+                <!-- Buttons in a Vertical Column -->
+                <div class="d-flex flex-column w-75 m-3 gap-3 py-33">
+                    <button id="save-btn" class="btn btn-outline-dark">Enregistrer</button>
+                    <button id="delete-btn" class="btn btn-outline-danger">Supprimer</button>
+                    <button id="create-btn" class="btn btn-outline-dark">Créer</button>
+                    <button id="home-btn" class="btn btn-outline-danger">Home</button>
                 </div>
             </div>
 
-            <ul id="file-list"></ul>
-            <select id="class-selection" multiple></select>
-
-            <div class="action-buttons">
-                <button id="save-btn" class="btn btn-outline-dark">Speichern</button>
-                <button id="delete-btn" class="btn btn-outline-danger">Löschen</button>
-                <button id="create-btn" class="btn btn-outline-dark">Erstellen</button>
-                <button id="home-btn" class="btn btn-outline-danger">Home</button>
-            </div>
         </div>
     </div>
 
