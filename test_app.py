@@ -23,7 +23,7 @@ def login():
     try:
         with auth.open() as (connection, cursor):
 
-    # Student prüfen
+    #Student prüfen
         query_student = "SELECT id FROM mf_student WHERE username = %s AND password = %s"
         cursor.execute(query_student, (username, password))
         student = cursor.fetchone()
