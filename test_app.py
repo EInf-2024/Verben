@@ -23,14 +23,14 @@ def login():
     try:
         with auth.open() as (connection, cursor):
 
-        # Erst Student prüfen
+    # Student prüfen
         query_student = "SELECT id FROM mf_student WHERE username = %s AND password = %s"
         cursor.execute(query_student, (username, password))
         student = cursor.fetchone()
         if student:
             return jsonify({"role": "sus", "id": student["id"]})
 
-        # Dann Lehrer prüfen
+    #Dann Lehrer prüfen
         query_teacher = "SELECT id FROM mf_teacher WHERE username = %s AND password = %s"
         cursor.execute(query_teacher, (username, password))
         teacher = cursor.fetchone()
@@ -103,7 +103,7 @@ def training():
 
 
 
-@app.route('/verify', methods=['POST'])
+@auth.route(app,"/verify", required_role=["student"], methods=['POST'])
 def verify():
     data = request.get_json()  # Get JSON data
     score = data.get("score")  # Extract "score" object
@@ -112,8 +112,8 @@ def verify():
     return '', 204  # 204 No Content (no response needed)
 
 
-@app.route('/lpview', methods=['GET'])
-def toLP():
+@auth.route(app,"/lpview", required_role=["teacher"], methods=['GET'])
+def tolp():
     token = request.args.get('token')
     if token == '1':
         result = {
@@ -126,7 +126,7 @@ def toLP():
         return jsonify(result)
 
 
-@app.route('/lpclass', methods=['GET'])
+@auth.route(app,"/lpclass", required_role=["teacher"], methods=['GET'])
 def lpclass():
     token = request.args.get('token')
     class_id = request.args.get('class_id')
@@ -141,7 +141,7 @@ def lpclass():
 
 # upload eines pdfs
 
-@app.route('/upload', methods=['POST'])
+@auth.route(app,"/upload", required_role=["teacher"], methods=['POST'])
 def upload():
 
     text = request.form.get('text')
@@ -162,7 +162,7 @@ def upload():
     return jsonify(result)
 
 
-@app.route('/getunit', methods=['GET'])
+@auth.route(app,"/getunit", required_role=["teacher"], methods=['GET'])
 def getunit():
     token = request.args.get('token')
     unit_id = request.args.get('unit_id')
@@ -180,7 +180,7 @@ def getunit():
     return jsonify(result)
 
 
-@app.route('/createunit', methods=['POST'])
+@auth.route(app,"createunit", required_role=["teacher"], methods=['POST'])
 def createunit():
     data = request.get_json()  # Get JSON data
     new_unit = data.get("unit")
@@ -190,7 +190,7 @@ def createunit():
     return '', 204
 
 
-@app.route('/saveunit', methods=['POST'])
+@auth.route(app,"/saveunit", required_role=["teacher"], methods=['POST'])
 def saveunit():
     data = request.get_json()  # Get JSON data
     new_unit = data.get("unit")
@@ -200,7 +200,7 @@ def saveunit():
     print(new_unit['selected_classes'])
     return '', 204
 
-@app.route('/deleteunit', methods=['GET'])
+@auth.route(app,"/deleteunit", required_role=["teacher"], methods=['GET'])
 def deleteunit():
     token = request.args.get('token')
     unit_id = request.args.get('unit_id')
