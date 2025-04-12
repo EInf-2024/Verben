@@ -4,14 +4,12 @@ from dotenv import load_dotenv
 import openai
 from config import get_connection
 import mysql.connector
-import auth
-from pydantic import BaseModel
-from typing import List, Dict
+from auth import auth
 
 app = Flask(__name__)
 load_dotenv()  # Lädt Variablen aus der .env-Datei
-openai.api_key = os.getenv("OPENAI_API_KEY")
-client = openai.OpenAI()
+api_key = os.getenv("OPENAI_API_KEY")
+client = openai.OpenAI(api_key=api_key)
 
 @app.route('/')
 def index():
