@@ -43,8 +43,8 @@ def login():
         return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
 
 
-@app.route('/susview', methods=['GET'])
-def toSuS():
+@auth.route(app,"/susview", required_role=["student"], methods=['GET'])
+def tosus():
     token = request.args.get('token')
     result = {
         'username': 'Rudolf',
