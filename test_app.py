@@ -88,7 +88,7 @@ def tenses():
 
 
 
-@app.route('/training', methods=['GET'])
+@auth.route(app,"/training", required_role=["student"], methods=['GET'])
 def training():
     token = request.args.get('token')
     selected_tenses = request.args.get('tenses')
