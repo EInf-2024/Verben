@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import openai
 from config import get_connection
 import mysql.connector
+import auth
 from pydantic import BaseModel
 from typing import List, Dict
 
@@ -17,7 +18,7 @@ def index():
     return render_template('index.html')
 
 #Test
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['POST'])/(auth.login)
 def login():
     username = request.args.get('username')
     password = request.args.get('password')
