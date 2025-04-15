@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, g
 from dotenv import load_dotenv
 import os
 import openai
@@ -16,57 +16,72 @@ def index():
     return render_template("index.html")
 
 @app.route('/login', methods=['POST'])(auth.login)
-def login():
-    username = request.args.get('username')
-    password = request.args.get('password')
-
-    try:
-        with auth.open() as (connection, cursor):
-
-    #Student prüfen
-        query_student = "SELECT id FROM mf_student WHERE username = %s AND password = %s"
-        cursor.execute(query_student, (username, password))
-        student = cursor.fetchone()
-        if student:
-            return jsonify({"role": "sus", "id": student["id"]})
-
-    #Dann Lehrer prüfen
-        query_teacher = "SELECT id FROM mf_teacher WHERE username = %s AND password = %s"
-        cursor.execute(query_teacher, (username, password))
-        teacher = cursor.fetchone()
-        if teacher:
-            return jsonify({"role": "lp", "id": teacher["id"]})
-        else:
-            return jsonify({"error": "Ungültiger Login"}), 401
-
-    except Exception as e:
-        return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
-
 
 @auth.route(app,"/susview", required_role=["student"], methods=['GET'])
 def tosus():
-    token = request.args.get('token')
-    result = {
-        'username': 'Rudolf',
-        'progress': {
-            'Présent': 0.81,
-            'Passé composé': 0.25,
-            'Imparfait': 0.91,
-            'Plus-que-parfait': 0.12,
-            'Futur simple': 0.97,
-            'Conditionnel présent': 0.98,
-            'Conditionnel passé': 0.79,
-            'Subjonctif présent': 0.17,
-            'Subjonctif passé': 0.41,
-            'Impératif': 0.73
-        },
-        'units': {
-            '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
-            '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'
-        }}
-    return jsonify(result)
+    user_id = g.get("user_id")
+    auth_role = g.get("auth_role")
+    try:
+        with auth.open() as (connection, cursor):
+            # Username & department id aus Tabelle mf_student
+            cursor.execute("SELECT username, department_id FROM mf_student WHERE id = %s", (user_id,))
+            student_info = cursor.fetchone()
+            if not student_info:
+                return jsonify({"error": "Student nicht gefunden"}), 404
+            # Username & department in variablen speichern
+            username = student_info["username"]
+            department_id = student_info["department_id"]
 
+            # fortschritt von user holen und berechnen
+            cursor.execute("SELECT * FROM fortschritt WHERE user_id = %s", (user_id,))
+            progress_data = cursor.fetchone()
+            progress = {}
 
+            if progress_data:
+                zeitformen = [
+                    ("Présent", "present_right", "present_all"),
+                    ("Passé composé", "passecompose_right", "passecompose_all"),
+                    ("Imparfait", "imparfait_right", "imparfait_all"),
+                    ("Plus-que-parfait", "plus-que-parfait_right", "plus-que-parfait_all"),
+                    ("Futur simple", "futur_simple_right", "futur_simple_all"),
+                    ("Conditionnel présent", "conditionnel_present_right", "conditionnel_present_all"),
+                    ("Conditionnel passé", "conditionnel_passe_right", "conditionnel_passe_all"),
+                    ("Subjonctif présent", "subjonctif_present_right", "subjonctif_present_all"),
+                    ("Subjonctif passé", "subjonctif_passe_right", "subjonctif_passe_all"),
+                    ("Impératif", "imperatif_right", "imperatif_all"),
+                ] #Rechnen
+                for label, right_key, all_key in zeitformen:
+                    right = progress_data.get(right_key, 0)
+                    total = progress_data.get(all_key, 0)
+                    progress[label] = round(right / total, 2) if total > 0 else 0.0
+
+            # unit_ids aus lz_unit_pro_klass holen
+            cursor.execute("SELECT unit_id FROM lz_unit_pro_klass WHERE klasse_id = %s", (department_id,))
+            unit_ids = cursor.fetchall()
+
+            unit_names = {}#kommen nachher die Unitnamen rein
+            if unit_ids:#?????
+                unit_id_list = tuple([u["unit_id"] for u in unit_ids])
+                # Aufpassen bei nur 1 Element in IN-Klausel (SQL erwartet (x,) nicht (x))
+                if len(unit_id_list) == 1:
+                    cursor.execute("SELECT unit_id, unit_name FROM lz_unit WHERE unit_id = %s", (unit_id_list[0],))
+                else:
+                    format_strings = ','.join(['%s'] * len(unit_id_list))
+                    cursor.execute(f"SELECT unit_id, unit_name FROM lz_unit WHERE unit_id IN ({format_strings})", unit_id_list)
+
+                units = cursor.fetchall()
+                unit_names = {str(u["unit_id"]): u["unit_name"] for u in units}
+
+            result = {
+                "username": username,
+                "progress": progress,
+                "units": unit_names
+            }
+
+            return jsonify(result)
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
 
 @app.route('/tenses', methods=['GET'])
 def tenses():
