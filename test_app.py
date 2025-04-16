@@ -85,22 +85,41 @@ def tosus():
 
 @app.route('/tenses', methods=['GET'])
 def tenses():
-    token = request.args.get('token')
-    if token == '1':
-        result = {
-            "Présent": True,
-            "Passé composé": True,
-            "Imparfait": True,
-            "Plus-que-parfait": True,
-            "Futur simple": True,
-            "Conditionnel présent": True,
-            "Conditionnel passé": True,
-            "Subjonctif présent": True,
-            "Subjonctif passé": True,
-            "Impératif": True
-        }
-        return jsonify(result)
+    user_id = g.get("user_id")
+    try:
+        with auth.open() as (connection, cursor):
+            #department_id von user
+            cursor.execute("SELECT department_id FROM mf_student WHERE id = %s", (user_id,))
+            student = cursor.fetchone()
 
+            if not student:
+                return jsonify({"error": 1, "message": "Student nicht gefunden"}), 404
+
+            department_id = student["department_id"]
+
+            #alle zeitform_id die zur department_id gehören
+            cursor.execute("SELECT zeitform_id FROM lz_zeitform_klasse WHERE klasse_id = %s", (department_id,))
+            zeitform_ids_raw = cursor.fetchall()
+            zeitform_ids = tuple([z["zeitform_id"] for z in zeitform_ids_raw])
+
+            # falls keine Zeitformen gefunden
+            if not zeitform_ids:
+                return jsonify({})
+
+            #alle Zeitformen anhand der zeitform_id
+            if len(zeitform_ids) == 1:
+                cursor.execute("SELECT name FROM lz_zeitform WHERE zeitform_id = %s", (zeitform_ids[0],))
+            else:
+                format_strings = ','.join(['%s'] * len(zeitform_ids))
+                cursor.execute(
+                    f"SELECT name FROM lz_zeitform WHERE zeitform_id IN ({format_strings})",
+                    zeitform_ids
+                )
+            result = cursor.fetchall()
+
+            return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 
 @auth.route(app,"/training", required_role=["student"], methods=['GET'])
