@@ -121,7 +121,7 @@ def tenses():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-
+#!!!AI
 @auth.route(app,"/training", required_role=["student"], methods=['GET'])
 def training():
     token = request.args.get('token')
@@ -135,8 +135,7 @@ def training():
                   {'start':'Si j’avais su, je','infinitive':'ne pas venir','solution':'ne serais pas venu','tense':'Plus-que-parfait','end':'à la fête'}]
         return jsonify(result)
 
-
-
+#???
 @auth.route(app,"/verify", required_role=["student"], methods=['POST'])
 def verify():
     data = request.get_json()  # Get JSON data
@@ -146,18 +145,54 @@ def verify():
     return '', 204  # 204 No Content (no response needed)
 
 
-@auth.route(app,"/lpview", required_role=["teacher"], methods=['GET'])
+@auth.route(app, "/lpview", required_role=["teacher"], methods=['GET'])
 def tolp():
-    token = request.args.get('token')
-    if token == '1':
-        result = {
-            'username': 'Mrs.French ',
-            'classes': {'1': 'G1A', '2': 'G1B', '3': 'G4H', '4': 'G1A', '5': 'G1B', '6': 'G4H', '7': 'G1A', '8': 'G1B', '9': 'G4H', '10': 'G1A', '11': 'G1B', '12': 'G4H'},
-            'units': {
-                '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3',
-                '4': 'Unité 4', '5': 'Unité 5', '6': 'Unité 6', '7': 'Unité 7'}
-        }
-        return jsonify(result)
+    user_id = g.get("user_id")
+    try:
+        with auth.open() as (connection, cursor):
+            result = {
+                "username": "",
+                "classes": {},
+                "units": {}
+            }
+
+            # Username aus mf_teacher
+            cursor.execute("SELECT abbreviation FROM mf_teacher WHERE id = %s", (user_id,))
+            teacher = cursor.fetchone()
+            if teacher:
+                result["username"] = teacher["abbreviation"]
+
+            # Klassenname + ID aus mf_department
+            cursor.execute("SELECT id, label FROM mf_department WHERE teacher_id = %s", (user_id,))
+            klassen = cursor.fetchall()
+            klassen_dict = {str(k["id"]): k["label"] for k in klassen}
+            result["classes"] = klassen_dict
+
+            klasse_ids = list(klassen_dict.keys())
+
+            # Unit-IDs aus lz_unit_pro_klass
+            if klasse_ids:
+                format_strings = ','.join(['%s'] * len(klasse_ids))
+                cursor.execute(
+                    f"SELECT DISTINCT unit_id FROM lz_unit_pro_klass WHERE klasse_id IN ({format_strings})",
+                    klasse_ids
+                )
+                unit_ids_raw = cursor.fetchall()
+                unit_ids = [str(u["unit_id"]) for u in unit_ids_raw]
+
+                # Unit-Namen aus lz_unit
+                if unit_ids:
+                    format_strings = ','.join(['%s'] * len(unit_ids))
+                    cursor.execute(
+                        f"SELECT unit_id, unit_name FROM lz_unit WHERE unit_id IN ({format_strings})",
+                        unit_ids
+                    )
+                    units = cursor.fetchall()
+                    result["units"] = {str(u["unit_id"]): u["unit_name"] for u in units}
+
+            return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 
 @auth.route(app,"/lpclass", required_role=["teacher"], methods=['GET'])
