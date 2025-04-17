@@ -124,7 +124,7 @@ function lpView(){
             // set up the units of the LP
             document.getElementById('lp-units').innerHTML=``
             for (const unit in data.units) {
-                const unit_field = document.createElement('div');
+                const unit_field = document.createElement('p');
                 unit_field.classList.add('unit-field')
                 unit_field.innerHTML = `${data.units[unit]}`
                 unit_field.setAttribute("data_id", `${unit}`)
@@ -224,7 +224,7 @@ document.getElementById("new-unit").addEventListener("click",function(){
 
 // a click on a unit field will lead to the edit unit view
 document.getElementById("lp-units").addEventListener("click",function (event) {
-    if (event.target.tagName === "DIV") {
+    if (event.target.tagName === "P") {
         const objectId = event.target.getAttribute("data_id");
 
         // requesting all the info about the clicked unit
@@ -370,18 +370,12 @@ document.getElementById("add-file-btn").addEventListener("click", () => {
 
 // Handle file selection
 document.getElementById('file-input').addEventListener('change', function(event) {
-    const files = Array.from(event.target.files); // Convert FileList to Array
-    selectedFiles = [...selectedFiles, ...files]; // Append new files instead of replacing
-
-    //  Update file list display
+    const file = event.target.files[0]; // Get the single selected file
     const fileList = document.getElementById('file-list');
-    fileList.innerHTML = '';
-    selectedFiles.forEach(file => {
-        const listItem = document.createElement('li');
-        listItem.textContent = file.name;
-        fileList.appendChild(listItem);
-    });
+
+    fileList.innerHTML = file ? `<li>${file.name}</li>` : '';
 });
+
 
 
 
@@ -432,8 +426,6 @@ document.getElementById("verb-list").addEventListener("click", function (event) 
 });
 
 
-
-
 // SuS view setup
 function susView (){
 
@@ -466,7 +458,7 @@ function susView (){
             const container = document.getElementById("sus-right");
             container.innerHTML=``
             for (const unit in data.units) {
-                const unit_field = document.createElement('div');
+                const unit_field = document.createElement('p');
                 unit_field.textContent = `${data.units[unit]}`
                 unit_field.setAttribute("data_id", `${unit}`)
                 unit_field.classList.add('unit-field')
@@ -481,7 +473,7 @@ function susView (){
 // get a click on a unitfield
 document.getElementById("sus-right").addEventListener("click",function (event) {
     document.getElementById('start-training-button').classList.remove('d-none')
-    if (event.target.tagName === "DIV") {
+    if (event.target.tagName === "P") {
         const objectId = event.target.getAttribute("data_id");
         const objectName = event.target.textContent
         const navbar = document.getElementById('nav-unit-name')
