@@ -121,7 +121,7 @@ def tenses():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-#!!!AI
+#!!!AI aufgabensätze mit KI erstellen
 @auth.route(app,"/training", required_role=["student"], methods=['GET'])
 def training():
     token = request.args.get('token')
@@ -232,21 +232,7 @@ def lpclass():
 
 
 
-@auth.route(app,"/lpclass", required_role=["teacher"], methods=['GET'])
-def lpclass():
-    user_id = g.get("user_id")
-    class_id = request.args.get('class_id')
-    if user_id == '1':
-        result = {
-            'sus_names': {'1': 'AliceAliceAlice', '2': 'Bob', '3': 'Eve','4': 'Alice', '5': 'Bob', '6': 'Eve','7': 'Alice', '8': 'Bob', '9': 'Eve','10': 'Alice', '11': 'Bob', '12': 'Eve'},
-            'units': {
-                '1': 'Unité 1', '2': 'Unité 2', '3': 'Unité 3'}
-        }
-        return jsonify(result)
-
-
-# upload eines pdfs
-
+# upload eines pdfs KI soll es in text/ objekte zurückgeben/ in Datenbank speichern
 @auth.route(app,"/upload", required_role=["teacher"], methods=['POST'])
 def upload():
 
@@ -267,23 +253,59 @@ def upload():
 
     return jsonify(result)
 
-
-@auth.route(app,"/getunit", required_role=["teacher"], methods=['GET'])
+@auth.route(app, "/getunit", required_role=["teacher"], methods=["GET"])
 def getunit():
-    token = request.args.get('token')
+    user_id = g.get("user_id")
     unit_id = request.args.get('unit_id')
-    result = {
-        'unit_name': 'Unité 3',
-        'classes': {'1': 'G1A', '2': 'G4H'},
-        'verbs': {
-            '1': 'Manger', '2': 'Parler', '3': 'Aimer', '4': 'Marcher',
-            '5': 'Jouer', '6': 'Travailler', '7': 'Étudier', '8': 'Regarder',
-            '9': 'Écouter', '10': 'Chanter', '11': 'Dormir', '12': 'Finir',
-            '13': 'Vivre', '14': 'Aller', '15': 'Venir', '16': 'Lire',
-            '17': 'Écrire', '18': 'Comprendre', '19': 'Savoir'
+
+    try:
+        with auth.open() as (connection, cursor):
+
+            # Unit-Name holen
+            cursor.execute("SELECT unit_name FROM lz_unit WHERE unit_id = %s", (unit_id,))
+            unit = cursor.fetchone()
+            unit_name = unit["unit_name"] if unit else "Unbekannt"
+
+            # Klasse-IDs zur Unit finden
+            cursor.execute("SELECT klasse_id FROM lz_unit_pro_klass WHERE unit_id = %s", (unit_id,))
+            klasse_ids = cursor.fetchall()
+            klasse_id_list = [k["klasse_id"] for k in klasse_ids]
+
+            classes = {}
+            if klasse_id_list:
+                format_strings = ','.join(['%s'] * len(klasse_id_list))
+                cursor.execute(
+                    f"SELECT id, label FROM mf_department WHERE id IN ({format_strings})",
+                    tuple(klasse_id_list)
+                )
+                klasse_data = cursor.fetchall()
+                classes = {str(k["id"]): k["label"] for k in klasse_data}
+
+            # Verb-IDs der Unit
+            cursor.execute("SELECT verb_id FROM lz_verb_pro_unit WHERE unit_id = %s", (unit_id,))
+            verb_ids = cursor.fetchall()
+            verb_id_list = [v["verb_id"] for v in verb_ids]
+
+            verbs = {}
+            if verb_id_list:
+                format_strings = ','.join(['%s'] * len(verb_id_list))
+                cursor.execute(
+                    f"SELECT verb_id, verb FROM lz_verb WHERE verb_id IN ({format_strings})",
+                    tuple(verb_id_list)
+                )
+                verb_data = cursor.fetchall()
+                verbs = {str(v["verb_id"]): v["verb"] for v in verb_data}
+
+        # Ergebnis zusammenbauen
+        result = {
+            'unit_name': unit_name,
+            'classes': classes,
+            'verbs': verbs
         }
-    }
-    return jsonify(result)
+        return jsonify(result)
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 
 @auth.route(app,"createunit", required_role=["teacher"], methods=['POST'])
