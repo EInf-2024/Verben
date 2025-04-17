@@ -116,7 +116,7 @@ function lpView(){
                 grade_option.innerHTML = `${data.classes[cl]}`
                 grade.setAttribute("data_id", `${cl}`)
                 grade_option.value =`${cl}`
-                grade.classList.add("class-circle", "d-flex", "align-items-center", "justify-content-center","bg-info","cursor-pointer","user-select-none")
+                grade.classList.add("class-circle", "d-flex", "align-items-center", "justify-content-center","lp-options","cursor-pointer","user-select-none")
                 document.getElementById('lp-classes').appendChild(grade)
                 document.getElementById('class-selection').appendChild(grade_option)
             }
@@ -172,7 +172,7 @@ document.getElementById("lp-classes").addEventListener("click",function (event) 
                     const student_field = document.createElement('p');
                     student_field.innerHTML = `${data.sus_names[student]}`
                     student_field.setAttribute("data_id", `${student}`)
-                    student_field.classList.add("class-box", "d-flex", "align-items-center", "justify-content-center","bg-info","cursor-pointer","user-select-none")
+                    student_field.classList.add("class-box", "d-flex", "align-items-center", "justify-content-center","lp-options","cursor-pointer","user-select-none")
                     document.getElementById('lp-students').appendChild(student_field)
 
                 }
@@ -453,7 +453,7 @@ function susView (){
                     if (data.progress.hasOwnProperty(tense)) {
                         progressContainer.innerHTML = `
                             <div class="progress position-relative" style="width: 18vw; height: 2.5vw;">
-                                <div class="progress-bar bg-secondary text-dark" role="progressbar" style="width: ${parseFloat(data.progress[tense])*100}%;"></div>
+                                <div class="progress-bar bg-info text-dark" role="progressbar" style="width: ${parseFloat(data.progress[tense])*100}%;"></div>
                                 <span class="position-absolute w-100 text-center" style="font-size: 1.2vw; top: 50%; transform: translateY(-50%);">${tense}</span>
                             </div>
                         `;
@@ -594,6 +594,7 @@ document.getElementById("check-answers-button").addEventListener("click",functio
         if(button_clicks === "1"){
             const p = document.createElement("p");
             p.textContent = `${correctAnswer}`;
+            p.classList.add("fw-bold")
             sentence.appendChild(p);
         }
 
@@ -620,7 +621,7 @@ document.getElementById("check-answers-button").addEventListener("click",functio
         }
 
         const cp = cur_score[0] / cur_score[1]
-        document.getElementById('percentage').innerHTML = `${cp *100}%`
+        document.getElementById('percentage').innerHTML = `${cp *100}% correct`
         document.getElementById("check-answers-button").setAttribute("clicked",1)
 });
 

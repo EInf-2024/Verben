@@ -19,7 +19,7 @@ body {
 /* Style for the SuS left panel */
 .left-panel {
     width: 20%;
-    background-color: #e8eded;
+    background-color: #F4F4F4FF;
     position: fixed;
     height: 100vh;
     display: flex;
@@ -41,10 +41,23 @@ body {
     align-content: start;
     padding: 2vw; /* Adds space around the items */
     height: 100vh;
-    background-color: #D4E9E1;
+    background-color: #F4F4F4FF;
 }
 .progress-bar.bg-info {
-  background-color: #5E9FA9 !important; /* custom orange color */
+  background-color: #5ab4c8 !important; /* custom orange color */
+}
+
+/* overriding bootstrap colors */
+.btn-info {
+  background-color: #414145 !important;
+  border-color: #414145 !important;
+  color: #fff !important; /* optional: set text color */
+}
+
+.btn-info:hover,
+.btn-info:focus {
+  background-color: #5E6472 !important; /* slightly darker for hover effect */
+  border-color: #5E6472 !important;
 }
 
 /* Username styles */
@@ -141,6 +154,15 @@ body {
 
 }
 
+.lp-options{
+    background-color: #5ab4c8;
+}
+.lp-options:hover{
+    background-color: #70d1e6;
+}
+
+
+
 /* Styles for the new unit button to make it square */
 .square-btn {
   aspect-ratio: 1 / 1;
@@ -151,7 +173,7 @@ body {
 
 /* Style for a unit field */
 .unit-field {
-    background-color: #5E6472;
+    background-color: #414145;
     font-size: 3vw;
     color: white;
     width: 100%;  /* Automatically take the full width of the grid cell */
@@ -166,7 +188,7 @@ body {
 
 
 .unit-field:hover {
-    background-color: #414145;
+    background-color: #5E6472 ;
 }
 /* Styles for tense selection view  */
 .responsive-text {
