@@ -135,7 +135,7 @@ def training():
                   {'start':'Si j’avais su, je','infinitive':'ne pas venir','solution':'ne serais pas venu','tense':'Plus-que-parfait','end':'à la fête'}]
         return jsonify(result)
 
-#???
+#Score des Schülers in datenbank speichern
 @auth.route(app,"/verify", required_role=["student"], methods=['POST'])
 def verify():
     data = request.get_json()  # Get JSON data
@@ -231,7 +231,6 @@ def lpclass():
         return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
 
 
-
 # upload eines pdfs KI soll es in text/ objekte zurückgeben/ in Datenbank speichern
 @auth.route(app,"/upload", required_role=["teacher"], methods=['POST'])
 def upload():
@@ -252,6 +251,7 @@ def upload():
     }
 
     return jsonify(result)
+
 
 @auth.route(app, "/getunit", required_role=["teacher"], methods=["GET"])
 def getunit():
@@ -307,7 +307,7 @@ def getunit():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-
+#Neue Infos wie unit_name, klassen, verben etc erstellen und an Datenbank geben
 @auth.route(app,"createunit", required_role=["teacher"], methods=['POST'])
 def createunit():
     data = request.get_json()  # Get JSON data
@@ -317,7 +317,7 @@ def createunit():
     print(new_unit['selected_classes'])
     return '', 204
 
-
+#unit welche schon erstellt sind, einzelne verben aber gelöscht/ hinzugefügt werden
 @auth.route(app,"/saveunit", required_role=["teacher"], methods=['POST'])
 def saveunit():
     data = request.get_json()  # Get JSON data
@@ -328,6 +328,7 @@ def saveunit():
     print(new_unit['selected_classes'])
     return '', 204
 
+#ganze units löschen-> unit_id, verben
 @auth.route(app,"/deleteunit", required_role=["teacher"], methods=['GET'])
 def deleteunit():
     token = request.args.get('token')
