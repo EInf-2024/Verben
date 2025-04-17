@@ -17,7 +17,7 @@ def index():
 
 @app.route('/login', methods=['POST'])(auth.login)
 
-@auth.route(app,"/susview", required_role=["student"], methods=['GET'])
+@auth.route(app,"/susview", required_role=["student", "teacher"], methods=['GET'])
 def tosus():
     user_id = g.get("user_id")
     auth_role = g.get("auth_role")
@@ -194,12 +194,49 @@ def tolp():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
+@auth.route(app, "/lpclass", required_role=["teacher"], methods=['GET'])
+def lpclass():
+    user_id = g.get("user_id")
+    class_id = request.args.get('class_id')
+
+    try:
+        with auth.open() as (connection, cursor):
+            result = {
+                'sus_names': {},
+                'units': {}
+            }
+
+            # Schüler mit class_id
+            cursor.execute("SELECT id, username FROM mf_student WHERE department_id = %s", (class_id,))
+            sus = cursor.fetchall()
+            result["sus_names"] = {str(s["id"]): s["username"] for s in sus}
+
+            # Unit-IDs der Klasse
+            cursor.execute("SELECT unit_id FROM lz_unit_pro_klass WHERE klasse_id = %s", (class_id,))
+            unit_ids = [str(u["unit_id"]) for u in cursor.fetchall()]
+
+            # Unit-Namen
+            if unit_ids:
+                format_strings = ','.join(['%s'] * len(unit_ids))
+                cursor.execute(
+                    f"SELECT unit_id, unit_name FROM lz_unit WHERE unit_id IN ({format_strings})",
+                    unit_ids
+                )
+                units = cursor.fetchall()
+                result["units"] = {str(u["unit_id"]): u["unit_name"] for u in units}
+
+            return jsonify(result)
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
+
+
 
 @auth.route(app,"/lpclass", required_role=["teacher"], methods=['GET'])
 def lpclass():
-    token = request.args.get('token')
+    user_id = g.get("user_id")
     class_id = request.args.get('class_id')
-    if token == '1':
+    if user_id == '1':
         result = {
             'sus_names': {'1': 'AliceAliceAlice', '2': 'Bob', '3': 'Eve','4': 'Alice', '5': 'Bob', '6': 'Eve','7': 'Alice', '8': 'Bob', '9': 'Eve','10': 'Alice', '11': 'Bob', '12': 'Eve'},
             'units': {
