@@ -63,10 +63,15 @@ document.getElementById("login-button").addEventListener("click",function (){
     const username = document.getElementById('input-name').value
     const password = document.getElementById('input-password').value
 
-    fetch(`/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`)
+    fetch("/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: encodeURIComponent(username), password: encodeURIComponent(password) })
+    })
         .then(response => response.json())
         .then(data => {
-            token = data.token
+            token = data.access_token;
+            role = data.role;
             if (data.role === 's'){
                 susView()
             }
@@ -74,7 +79,8 @@ document.getElementById("login-button").addEventListener("click",function (){
                 lpView()
             }
         })
-        .catch(error => console.error('Error', error))
+        .catch(error => console.error('Fehler', error))
+    
 });
 
 
@@ -130,7 +136,9 @@ function lpView(){
                 unit_field.setAttribute("data_id", `${unit}`)
                 document.getElementById('lp-units').appendChild(unit_field)
             }
-        });
+
+        })
+
     // actually switch to the LP view
     toLP()
 }
@@ -177,6 +185,7 @@ document.getElementById("lp-classes").addEventListener("click",function (event) 
 
                 }
             })
+        .catch(error => console.error('Fehler', error))
     }
 });
 
@@ -210,6 +219,7 @@ document.getElementById("lp-students").addEventListener("click",function (event)
                     lpInfoContainer.appendChild(progressContainer);
                 }
             })
+        .catch(error => console.error('Fehler', error))
     }
 });
 
@@ -252,6 +262,8 @@ document.getElementById("lp-units").addEventListener("click",function (event) {
                 }
 
             })
+        .catch(error => console.error('Fehler', error))
+
         // hiding and displaying the right set of buttons
         document.getElementById('save-btn').classList.remove('d-none')
         document.getElementById('delete-btn').classList.remove('d-none')
@@ -281,7 +293,7 @@ document.getElementById('delete-btn').addEventListener('click',function(){
     .then(message => {
         console.log("Server response:", message); // Log the success message
     })
-    .catch(error => console.error("Fetch error:", error));
+    .catch(error => console.error("Fehler:", error));
     lpView()
 });
 
@@ -308,7 +320,7 @@ document.getElementById('create-btn').addEventListener('click',function(){
     fetch("/createunit", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ unit: unit }) // Send the entire object
+        body: JSON.stringify({ unit: encodeURIComponent(unit) }) // Send the entire object
     })
     .then(response => {
         if (!response.ok) {
@@ -317,7 +329,7 @@ document.getElementById('create-btn').addEventListener('click',function(){
             console.log("unit sent successfully");
         }
     })
-    .catch(error => console.error("Fetch error:", error));
+    .catch(error => console.error('Fehler', error))
     lpView()
 
 });
@@ -346,7 +358,7 @@ document.getElementById('save-btn').addEventListener('click',function(){
     fetch("/saveunit", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ unit: unit }) // Send the entire object
+        body: JSON.stringify({ unit: encodeURIComponent(unit) }) // Send the entire object
     })
     .then(response => {
         if (!response.ok) {
@@ -355,7 +367,7 @@ document.getElementById('save-btn').addEventListener('click',function(){
             console.log("unit sent successfully");
         }
     })
-    .catch(error => console.error("Fetch error:", error));
+    .catch(error => console.error('Fehler', error))
     console.log('saved')
     lpView()
 });
@@ -408,7 +420,7 @@ document.getElementById('add-btn').addEventListener('click', function() {
         }
 
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => console.error('Fehler', error))
 
     //after the files have been sent, clear the input
     selectedFiles = []
@@ -496,6 +508,7 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
                     }
                 }
             })
+        .catch(error => console.error('Fehler', error))
         toTenses()
     }
 });
@@ -510,25 +523,26 @@ document.getElementById("start-training-button").addEventListener("click",functi
 
     // creates the sentences that are sent back by flask
     fetch(`/training?token=${encodeURIComponent(token)}&tenses=${encodeURIComponent(selectedTenses.join(','))}&unit=${encodeURIComponent(selected_unit)}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('exercise-view').innerHTML = ``
-                for (const sentence of data) {
-                    const sentence_container = document.createElement('div');
-                    sentence_container.classList.add('gap-sentence');
-                    sentence_container.innerHTML = `
-                    ${sentence.start} 
-                    <input type="text" class="gap-input" data-answer="${sentence.solution}" data-tense="${sentence.tense}">
-                    (${sentence.infinitive}) 
-                    ${sentence.end}
-                    <p>(${sentence.tense})</p>
-                    `;
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('exercise-view').innerHTML = ``
+            for (const sentence of data) {
+                const sentence_container = document.createElement('div');
+                sentence_container.classList.add('gap-sentence');
+                sentence_container.innerHTML = `
+                ${sentence.start} 
+                <input type="text" class="gap-input" data-answer="${sentence.solution}" data-tense="${sentence.tense}">
+                (${sentence.infinitive}) 
+                ${sentence.end}
+                <p>(${sentence.tense})</p>
+                `;
 
-                    sentence_container.setAttribute("solution", `${sentence.solution}`)
-                    document.getElementById('exercise-view').appendChild(sentence_container);
+                sentence_container.setAttribute("solution", `${sentence.solution}`)
+                document.getElementById('exercise-view').appendChild(sentence_container);
 
-                }
-            })
+            }
+        })
+    .catch(error => console.error('Fehler', error))
     document.getElementById("check-answers-button").setAttribute("clicked",0)
     toExercise()
 });
@@ -599,7 +613,7 @@ document.getElementById("check-answers-button").addEventListener("click",functio
                 headers: {
                 "Content-Type": "application/json"
             },
-                body: JSON.stringify({ score: score }) // Send the entire object
+                body: JSON.stringify({ score: encodeURIComponent(score) }) // Send the entire object
             })
         .then(response => {
             if (!response.ok) {
@@ -609,7 +623,7 @@ document.getElementById("check-answers-button").addEventListener("click",functio
                 console.log("Score sent successfully");
             }
             })
-        .catch(error => console.error("Fetch error:", error));
+        .catch(error => console.error('Fehler', error))
         }
 
         const cp = cur_score[0] / cur_score[1]
