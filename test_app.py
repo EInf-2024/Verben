@@ -121,19 +121,69 @@ def tenses():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-#!!!AI aufgabensätze mit KI erstellen
-@auth.route(app,"/training", required_role=["student"], methods=['GET'])
+
+@auth.route(app, "/training", required_role=["student"], methods=['GET'])
 def training():
-    token = request.args.get('token')
-    selected_tenses = request.args.get('tenses')
-    unit = request.args.get('unit')
-    if token == '1':
-        result = [{'start':'Quand j’étais petit, je','infinitive':'jouer','solution':'jouais','tense':'Imparfait','end':'au foot tous les jours.'},
-                  {'start':'Demain, nous','infinitive':'partir','solution':'partirons','tense':'Futur simple','end':' en vacances à la mer.'},
-                  {'start':'Chaque été, nous ','infinitive':'aller','solution':' allions','tense':'Imparfait','end':'à la plage avec ma famille.'},
-                  {'start':'Hier, ils','infinitive':'voir','solution':'ont vu','tense':'Passé composé','end':'un film très intéressant.'},
-                  {'start':'Si j’avais su, je','infinitive':'ne pas venir','solution':'ne serais pas venu','tense':'Plus-que-parfait','end':'à la fête'}]
-        return jsonify(result)
+    try:
+        unit_id = request.args.get("unit")
+        selected_tenses = request.args.get("tenses")  # z.B. "Présent,Passé composé"
+        if not unit_id or not selected_tenses:
+            return jsonify({"error": 1, "message": "unit_id oder tenses fehlen"}), 400
+
+        selected_tenses_list = selected_tenses.split(",")
+
+        with auth.open() as (connection, cursor):
+            # alle Verben_id zur unit_id
+            cursor.execute("SELECT verb_id FROM lz_verb_pro_unit WHERE unit_id = %s", (unit_id,))
+            verb_ids = [row["verb_id"] for row in cursor.fetchall()]
+            #alle verben mit verbi_id
+            format_strings = ','.join(['%s'] * len(verb_ids))
+            cursor.execute(f"SELECT verb FROM lz_verb WHERE verb_id IN ({format_strings})", tuple(verb_ids))
+            verbs = [row["verb"] for row in cursor.fetchall()]
+
+        # Prompt für  KI
+        prompt = f"""
+        Tu es un professeur de français. Crée exactement 10 phrases en français à trous pour s'entraîner à la conjugaison.
+        - Utilise les verbes suivants: {', '.join(verbs)}.
+        - Utilise uniquement les temps suivants au moins une fois chacun: {', '.join(selected_tenses_list)}.
+        - S'il reste des phrases à compléter, choisis les temps restants au hasard parmi cette liste.
+        - Chaque phrase doit être correctement formulée et avoir une conjugaison claire et unique.
+
+        Format de sortie attendu en JSON (liste de 10 objets, pas de texte autour):
+        [
+          {{
+            "start": "Quand j’étais petit, je",
+            "infinitive": "jouer",
+            "solution": "jouais",
+            "tense": "Imparfait",
+            "end": "au foot tous les jours."
+          }},
+          ...
+        ]
+        """
+        # KI-Modell
+        response = client.beta.chat.completions.parse(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=800,
+            temperature=0.7,
+        )
+
+        # 4. Antwort parsen ???
+        ai_result = response.choices[0].message.content.strip()
+
+        # JSON sicher parsen ???
+        import json
+        try:
+            sentences = json.loads(ai_result)
+        except json.JSONDecodeError:
+            return jsonify({"error": 1, "message": "KI-Antwort konnte nicht als JSON interpretiert werden."}), 500
+
+        return jsonify(sentences)
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
+
 
 #Score des Schülers in datenbank speichern
 @auth.route(app,"/verify", required_role=["student"], methods=['POST'])
@@ -317,7 +367,7 @@ def createunit():
     print(new_unit['selected_classes'])
     return '', 204
 
-#unit welche schon erstellt sind, einzelne verben aber gelöscht/ hinzugefügt werden
+#unit welche schon erstellt sind, einzelne verben löschen/ hinzugefügen, klassen zuordnen, name verändern
 @auth.route(app,"/saveunit", required_role=["teacher"], methods=['POST'])
 def saveunit():
     data = request.get_json()  # Get JSON data
