@@ -328,12 +328,40 @@ def saveunit():
     print(new_unit['selected_classes'])
     return '', 204
 
-#ganze units löschen-> unit_id, verben
-@auth.route(app,"/deleteunit", required_role=["teacher"], methods=['GET'])
+@auth.route(app, "/deleteunit", required_role=["teacher"], methods=['POST'])
 def deleteunit():
-    token = request.args.get('token')
+    user_id = g.get("user_id")
     unit_id = request.args.get('unit_id')
-    return "Unit deleted successfully", 200
+
+    try:
+        with auth.open() as (connection, cursor):
+
+            # Löscht Einträge in lz_unit_pro_klass
+            delete_klass_query = "DELETE FROM lz_unit_pro_klass WHERE unit_id = %s"
+            cursor.execute(delete_klass_query, (unit_id,))
+
+            # verb_id's aus lz_verb_pro_unit mit unit_id
+            get_verbs_query = "SELECT verb_id FROM lz_verb_pro_unit WHERE unit_id = %s"
+            cursor.execute(get_verbs_query, (unit_id,))
+            verb_ids = cursor.fetchall()
+
+            # löscht verben
+            verb_id_list = [v["verb_id"] for v in verb_ids]
+            format_strings = ','.join(['%s'] * len(verb_id_list))
+            cursor.execute(f"DELETE FROM lz_verb WHERE verb_id IN ({format_strings})", tuple(verb_id_list))
+
+            # löscht einträge verb_pro_unit
+            delete_verbs_query = "DELETE FROM lz_verb_pro_unit WHERE unit_id = %s"
+            cursor.execute(delete_verbs_query, (unit_id,))
+
+            # löscht eintrag in unit
+            delete_unit_query = "DELETE FROM lz_unit WHERE unit_id = %s"
+            cursor.execute(delete_unit_query, (unit_id,))
+            connection.commit()
+
+        return jsonify({"success": True, "message": "Unit wurde erfolgreich gelöscht."}), 200
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 
 if __name__ == '__main__':
