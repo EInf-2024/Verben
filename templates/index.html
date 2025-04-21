@@ -13,7 +13,7 @@
     <! –– navigation bar for SuS when in exercise view ––>
     <header id="navbar" class="d-none d-flex flex-row justify-content-center align-items-center fixed-top bg-white px-3 py-2 w-100 gap-5">
         <button id="home-button" class="btn btn-info w-auto">Home</button>
-        <p id="nav-unit-name" class="mb-0"></p>
+        <p id="nav-unit-name" class="h4 fw-bold mt-2"></p>
         <button id="start-training-button" class="btn btn-success w-auto d-none">Commencer l'exercice</button>
         <button id="check-answers-button" class="btn btn-success w-auto">Vérifier les réponses</button>
         <p id="percentage" class="mb-0"></p>
@@ -26,7 +26,7 @@
             <h2 class="text-center mb-4">Login</h2>
             <input id="input-name" type="text" class="form-control mb-3" placeholder="Nom">
             <input id="input-password" type="password" class="form-control mb-3" placeholder="Mot de passe">
-            <button id="login-button" class="btn btn-dark w-100">Se connecter</button>
+            <button id="login-button" class="btn btn-info w-100">Se connecter</button>
         </div>
     </div>
 
@@ -56,8 +56,8 @@
             <div id="lp-classes" class="lp-user-info bg-light p-3 text-center d-flex flex-column align-items-center"></div>
         </div>
 
-        <div id="lp-students" class="LP-left2-panel scrollbar"></div>
-        <div class="LP-left4-panel p-3"><button id="new-unit" class="btn btn-dark w-100 square-btn">Nouvelle unité</button></div>
+        <div id="lp-students" class="LP-left2-panel scrollbar bg-light"></div>
+        <div class="LP-left4-panel"><button id="new-unit" class="fs-1 btn btn-info square-btn">+</button></div>
         <div id="lp-units" class="LP-left3-panel scrollbar"></div>
         <div id="lp-sus-progress" class="LP-left5-panel scrollbar d-none"></div>
     </div>
@@ -86,7 +86,7 @@
                 </div>
 
                 <!-- Hidden file input -->
-                <input class="d-none" type="file" id="file-input" accept="application/pdf" multiple>
+                <input class="d-none" type="file" id="file-input" accept="application/pdf">
             </div>
 
             <div class="action-buttons d-flex justify-content-between align-items-center">
@@ -105,6 +105,6 @@
         </div>
     </div>
 
-    <script src="../static/script.js" defer></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

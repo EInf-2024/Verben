@@ -1,10 +1,11 @@
 /* Main body styles */
+
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f0f0f0;
+    background-color: #f4f4f4;
     font-family: Arial, sans-serif;
     overflow: hidden;
 }
@@ -40,7 +41,23 @@ body {
     align-content: start;
     padding: 2vw; /* Adds space around the items */
     height: 100vh;
-    background-color: #e0e0e0;
+    background-color: #f4f4f4;
+}
+.progress-bar.bg-info {
+  background-color: #5ab4c8 !important; /* custom orange color */
+}
+
+/* overriding bootstrap colors */
+.btn-info {
+  background-color: #414145 !important;
+  border-color: #414145 !important;
+  color: #fff !important; /* optional: set text color */
+}
+
+.btn-info:hover,
+.btn-info:focus {
+  background-color: #5E6472 !important; /* slightly darker for hover effect */
+  border-color: #5E6472 !important;
 }
 
 /* Username styles */
@@ -100,10 +117,12 @@ body {
 
 .LP-left4-panel {
     width: 8%;
+    height: 100%;
     margin-left: 92%;
     background-color: #f4f4f4;
     position: fixed;
-    height: 100vh;
+    display: flex;
+    justify-content: center;
 }
 
 
@@ -137,17 +156,28 @@ body {
 
 }
 
+.lp-options{
+    background-color: #5ab4c8;
+}
+.lp-options:hover{
+    background-color: #70d1e6;
+}
+
 /* Styles for the new unit button to make it square */
 .square-btn {
-  aspect-ratio: 1 / 1;
-  margin: clamp(1px, .2vw, .3vw);
-  font-size: 2rem;
+  width: 100%;
+  height: 7vw;
+  margin: clamp(10px, 5%, 5%);
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
 /* Style for a unit field */
 .unit-field {
-    background-color: #242427;
+    background-color: #414145;
     font-size: 3vw;
     color: white;
     width: 100%;  /* Automatically take the full width of the grid cell */
@@ -162,7 +192,7 @@ body {
 
 
 .unit-field:hover {
-    background-color: #414145;
+    background-color: #5E6472 ;
 }
 /* Styles for tense selection view  */
 .responsive-text {
