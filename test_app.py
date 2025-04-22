@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, render_template, g
 from dotenv import load_dotenv
+from PyPDF2 import PdfReader
+import json
 import os
 import openai
 import logging
@@ -121,7 +123,6 @@ def tenses():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-
 @auth.route(app, "/training", required_role=["student"], methods=['GET'])
 def training():
     try:
@@ -143,13 +144,13 @@ def training():
 
         # Prompt für  KI
         prompt = f"""
-        Tu es un professeur de français. Crée exactement 10 phrases en français à trous pour s'entraîner à la conjugaison.
-        - Utilise les verbes suivants: {', '.join(verbs)}.
-        - Utilise uniquement les temps suivants au moins une fois chacun: {', '.join(selected_tenses_list)}.
-        - S'il reste des phrases à compléter, choisis les temps restants au hasard parmi cette liste.
-        - Chaque phrase doit être correctement formulée et avoir une conjugaison claire et unique.
+        Du bist ein Französischlehrer. Erstelle genau 10 französische Lückensätze, um die Konjugation zu üben.
+        - Verwende die folgenden Verben: {', '.join(verbs)}.
+        - Nutze ausschließlich die folgenden Zeitformen und verwende jede mindestens einmal: {', '.join(selected_tenses_list)}.
+        - Falls danach noch Sätze übrig sind, wähle die restlichen Zeitformen zufällig aus dieser Liste.
+        - Jeder Satz soll grammatikalisch korrekt sein und eine eindeutige, klar erkennbare Konjugation enthalten.
 
-        Format de sortie attendu en JSON (liste de 10 objets, pas de texte autour):
+        Erwartetes Ausgabeformat als JSON (Liste mit 10 Objekten, ohne zusätzlichen Text drumherum):
         [
           {{
             "start": "Quand j’étais petit, je",
@@ -183,7 +184,6 @@ def training():
 
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
-
 
 #Score des Schülers in datenbank speichern
 @auth.route(app,"/verify", required_role=["student"], methods=['POST'])
@@ -280,27 +280,57 @@ def lpclass():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
 
-
-# upload eines pdfs KI soll es in text/ objekte zurückgeben/ in Datenbank speichern
-@auth.route(app,"/upload", required_role=["teacher"], methods=['POST'])
+@auth.route(app, "/upload", required_role=["teacher"], methods=["POST"])
 def upload():
+    try:
+        text = request.form.get('text', '')
+        files = request.files.getlist('pdfs')
 
-    text = request.form.get('text')
-    files = request.files.getlist('pdfs')  # Get multiple files
+        # PDF-Inhalt extrahieren
+        pdf_texts = []
+        for pdf_file in files:
+            reader = PdfReader(pdf_file)
+            for page in reader.pages:
+                content = page.extract_text()
+                if content:
+                    pdf_texts.append(content.strip())
 
-    saved_files = []
-    for pdf in files:
-        print(text)
-        print(pdf.filename)
-        saved_files.append(pdf.filename)
+        #  PDF + Text
+        full_text = "\n".join([text] + pdf_texts)
 
-    result = {
-        'verbs': {
-            '1': 'Manger', '2': 'Parler', '3': 'Aimer', '4': 'Marcher',
-            '5': 'Jouer', '6': 'Travailler', '7': 'Étudier'}
-    }
+        # KI-Prompt
+        prompt = f"""
+        Hier ist eine Liste von französischen Verben (Infinitivform). Bitte gib diese als JSON-Dictionary zurück, 
+        nummeriert ab 1, in folgendem Format: 
+        {{'1': 'manger', '2': 'parler', '3': 'aller', ...}}.
 
-    return jsonify(result)
+        Wichtig:
+        - Gib **nur das Dictionary** zurück – keine Erklärungen, kein Fließtext.
+        - Vermeide **Doppelungen** – jeder Eintrag soll nur einmal vorkommen.
+        - Wenn Zeilen leer oder ungültig sind, ignoriere sie.
+
+        *** VERBEN ***
+        {full_text}
+        """
+
+        response = client.beta.chat.completions.parse(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=500,
+            temperature=0.2,
+        )
+        raw_output = response.choices[0].message.content.strip()
+
+        # Versuch, die Ausgabe als JSON zu laden
+        try:
+            verbs = json.loads(raw_output)
+        except Exception:
+            verbs = {"error": "Formatierung konnte nicht gelesen werden", "raw": raw_output}
+
+        return jsonify({'verbs': verbs})
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Fehler beim Hochladen oder Verarbeiten: {str(e)}"}), 500
 
 
 @auth.route(app, "/getunit", required_role=["teacher"], methods=["GET"])
