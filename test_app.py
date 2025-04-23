@@ -17,6 +17,11 @@ def index():
     logging.info("Serving index.html")
     return render_template("index.html")
 
+@app.route('/index2')
+def index():
+    logging.info("Serving index2.html")
+    return render_template("index2.html")
+
 app.route('/login', methods=['POST'])(auth.login)
 
 @auth.route(app,"/susview", required_role=["student", "teacher"], methods=['GET'])
