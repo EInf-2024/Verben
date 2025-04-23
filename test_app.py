@@ -17,7 +17,7 @@ def index():
     logging.info("Serving index.html")
     return render_template("index.html")
 
-@app.route('/login', methods=['POST'])(auth.login)
+app.route('/login', methods=['POST'])(auth.login)
 
 @auth.route(app,"/susview", required_role=["student", "teacher"], methods=['GET'])
 def tosus():
@@ -388,7 +388,7 @@ def getunit():
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 #Neue Infos wie unit_name, klassen, verben etc erstellen und an Datenbank geben
-@auth.route(app,"createunit", required_role=["teacher"], methods=['POST'])
+@auth.route(app,"/createunit", required_role=["teacher"], methods=['POST'])
 def createunit():
     data = request.get_json()  # Get JSON data
     new_unit = data.get("unit")
