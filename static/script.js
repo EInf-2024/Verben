@@ -63,6 +63,7 @@ document.getElementById("login-button").addEventListener("click",function (){
     const username = document.getElementById('input-name').value
     const password = document.getElementById('input-password').value
 
+
     fetch("/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -70,6 +71,7 @@ document.getElementById("login-button").addEventListener("click",function (){
     })
         .then(response => response.json())
         .then(data => {
+            console.log(data)
             token = data.access_token;
             role = data.role;
             if (data.role === 's'){
