@@ -41,7 +41,7 @@ def tosus():
             department_id = student_info["department_id"]
 
             # fortschritt von user holen und berechnen
-            cursor.execute("SELECT * FROM fortschritt WHERE user_id = %s", (user_id,))
+            cursor.execute("SELECT * FROM lz_fortschritt WHERE user_id = %s", (user_id,))
             progress_data = cursor.fetchone()
             progress = {}
 
@@ -85,7 +85,6 @@ def tosus():
                 "progress": progress,
                 "units": unit_names
             }
-            print(result)
             return jsonify(result)
 
     except Exception as e:
@@ -126,7 +125,7 @@ def tenses():
                     zeitform_ids
                 )
             result = cursor.fetchall()
-
+            print(result)
             return jsonify(result)
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
