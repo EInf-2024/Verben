@@ -74,10 +74,10 @@ document.getElementById("login-button").addEventListener("click",function (){
             console.log(data)
             token = data.access_token;
             role = data.role;
-            if (data.role === 's'){
+            if (data.role === 'student'){
                 susView()
             }
-            if (data.role === 'l'){
+            if (data.role === 'teacher'){
                 lpView()
             }
         })
