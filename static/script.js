@@ -608,12 +608,13 @@ document.getElementById("check-answers-button").addEventListener("click",functio
 
     //send back the score
     if(button_clicks === "0"){
+        console.log(score)
         fetch("/verify", {
                 method: "POST",
                 headers: {
                 "Content-Type": "application/json"
             },
-                body: JSON.stringify({ score: encodeURIComponent(score) }) // Send the entire object
+                body: JSON.stringify({ score: score }) // Send the entire object
             })
         .then(response => {
             if (!response.ok) {
