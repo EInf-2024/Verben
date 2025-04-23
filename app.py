@@ -18,7 +18,7 @@ def index():
     return render_template("index.html")
 
 @app.route('/index2')
-def index():
+def index2():
     logging.info("Serving index2.html")
     return render_template("index2.html")
 
