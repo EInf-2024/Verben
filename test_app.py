@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, render_template, g
 from dotenv import load_dotenv
+from PyPDF2 import PdfReader
+import json
 import os
 import openai
 import logging
@@ -121,21 +123,69 @@ def tenses():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-#!!!AI aufgabensätze mit KI erstellen
-@auth.route(app,"/training", required_role=["student"], methods=['GET'])
+@auth.route(app, "/training", required_role=["student"], methods=['GET'])
 def training():
-    token = request.args.get('token')
-    selected_tenses = request.args.get('tenses')
-    unit = request.args.get('unit')
-    if token == '1':
-        result = [{'start':'Quand j’étais petit, je','infinitive':'jouer','solution':'jouais','tense':'Imparfait','end':'au foot tous les jours.'},
-                  {'start':'Demain, nous','infinitive':'partir','solution':'partirons','tense':'Futur simple','end':' en vacances à la mer.'},
-                  {'start':'Chaque été, nous ','infinitive':'aller','solution':' allions','tense':'Imparfait','end':'à la plage avec ma famille.'},
-                  {'start':'Hier, ils','infinitive':'voir','solution':'ont vu','tense':'Passé composé','end':'un film très intéressant.'},
-                  {'start':'Si j’avais su, je','infinitive':'ne pas venir','solution':'ne serais pas venu','tense':'Plus-que-parfait','end':'à la fête'}]
-        return jsonify(result)
+    try:
+        unit_id = request.args.get("unit")
+        selected_tenses = request.args.get("tenses")  # z.B. "Présent,Passé composé"
+        if not unit_id or not selected_tenses:
+            return jsonify({"error": 1, "message": "unit_id oder tenses fehlen"}), 400
 
-#???
+        selected_tenses_list = selected_tenses.split(",")
+
+        with auth.open() as (connection, cursor):
+            # alle Verben_id zur unit_id
+            cursor.execute("SELECT verb_id FROM lz_verb_pro_unit WHERE unit_id = %s", (unit_id,))
+            verb_ids = [row["verb_id"] for row in cursor.fetchall()]
+            #alle verben mit verbi_id
+            format_strings = ','.join(['%s'] * len(verb_ids))
+            cursor.execute(f"SELECT verb FROM lz_verb WHERE verb_id IN ({format_strings})", tuple(verb_ids))
+            verbs = [row["verb"] for row in cursor.fetchall()]
+
+        # Prompt für  KI
+        prompt = f"""
+        Du bist ein Französischlehrer. Erstelle genau 10 französische Lückensätze, um die Konjugation zu üben.
+        - Verwende die folgenden Verben: {', '.join(verbs)}.
+        - Nutze ausschließlich die folgenden Zeitformen und verwende jede mindestens einmal: {', '.join(selected_tenses_list)}.
+        - Falls danach noch Sätze übrig sind, wähle die restlichen Zeitformen zufällig aus dieser Liste.
+        - Jeder Satz soll grammatikalisch korrekt sein und eine eindeutige, klar erkennbare Konjugation enthalten.
+
+        Erwartetes Ausgabeformat als JSON (Liste mit 10 Objekten, ohne zusätzlichen Text drumherum):
+        [
+          {{
+            "start": "Quand j’étais petit, je",
+            "infinitive": "jouer",
+            "solution": "jouais",
+            "tense": "Imparfait",
+            "end": "au foot tous les jours."
+          }},
+          ...
+        ]
+        """
+        # KI-Modell
+        response = client.beta.chat.completions.parse(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=800,
+            temperature=0.7,
+        )
+
+        # 4. Antwort parsen ???
+        ai_result = response.choices[0].message.content.strip()
+
+        # JSON sicher parsen ???
+        import json
+        try:
+            sentences = json.loads(ai_result)
+        except json.JSONDecodeError:
+            return jsonify({"error": 1, "message": "KI-Antwort konnte nicht als JSON interpretiert werden."}), 500
+
+        return jsonify(sentences)
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
+
+#Score des Schülers in datenbank speichern
 @auth.route(app,"/verify", required_role=["student"], methods=['POST'])
 def verify():
     data = request.get_json()  # Get JSON data
@@ -230,28 +280,58 @@ def lpclass():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
 
-
-
-# upload eines pdfs KI soll es in text/ objekte zurückgeben/ in Datenbank speichern
-@auth.route(app,"/upload", required_role=["teacher"], methods=['POST'])
+@auth.route(app, "/upload", required_role=["teacher"], methods=["POST"])
 def upload():
+    try:
+        text = request.form.get('text', '')
+        files = request.files.getlist('pdfs')
 
-    text = request.form.get('text')
-    files = request.files.getlist('pdfs')  # Get multiple files
+        # PDF-Inhalt extrahieren
+        pdf_texts = []
+        for pdf_file in files:
+            reader = PdfReader(pdf_file)
+            for page in reader.pages:
+                content = page.extract_text()
+                if content:
+                    pdf_texts.append(content.strip())
 
-    saved_files = []
-    for pdf in files:
-        print(text)
-        print(pdf.filename)
-        saved_files.append(pdf.filename)
+        #  PDF + Text
+        full_text = "\n".join([text] + pdf_texts)
 
-    result = {
-        'verbs': {
-            '1': 'Manger', '2': 'Parler', '3': 'Aimer', '4': 'Marcher',
-            '5': 'Jouer', '6': 'Travailler', '7': 'Étudier'}
-    }
+        # KI-Prompt
+        prompt = f"""
+        Hier ist eine Liste von französischen Verben (Infinitivform). Bitte gib diese als JSON-Dictionary zurück, 
+        nummeriert ab 1, in folgendem Format: 
+        {{'1': 'manger', '2': 'parler', '3': 'aller', ...}}.
 
-    return jsonify(result)
+        Wichtig:
+        - Gib **nur das Dictionary** zurück – keine Erklärungen, kein Fließtext.
+        - Vermeide **Doppelungen** – jeder Eintrag soll nur einmal vorkommen.
+        - Wenn Zeilen leer oder ungültig sind, ignoriere sie.
+
+        *** VERBEN ***
+        {full_text}
+        """
+
+        response = client.beta.chat.completions.parse(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=500,
+            temperature=0.2,
+        )
+        raw_output = response.choices[0].message.content.strip()
+
+        # Versuch, die Ausgabe als JSON zu laden
+        try:
+            verbs = json.loads(raw_output)
+        except Exception:
+            verbs = {"error": "Formatierung konnte nicht gelesen werden", "raw": raw_output}
+
+        return jsonify({'verbs': verbs})
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Fehler beim Hochladen oder Verarbeiten: {str(e)}"}), 500
+
 
 @auth.route(app, "/getunit", required_role=["teacher"], methods=["GET"])
 def getunit():
@@ -307,7 +387,7 @@ def getunit():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-
+#Neue Infos wie unit_name, klassen, verben etc erstellen und an Datenbank geben
 @auth.route(app,"createunit", required_role=["teacher"], methods=['POST'])
 def createunit():
     data = request.get_json()  # Get JSON data
@@ -317,7 +397,7 @@ def createunit():
     print(new_unit['selected_classes'])
     return '', 204
 
-
+#unit welche schon erstellt sind, einzelne verben löschen/ hinzugefügen, klassen zuordnen, name verändern
 @auth.route(app,"/saveunit", required_role=["teacher"], methods=['POST'])
 def saveunit():
     data = request.get_json()  # Get JSON data
@@ -328,11 +408,40 @@ def saveunit():
     print(new_unit['selected_classes'])
     return '', 204
 
-@auth.route(app,"/deleteunit", required_role=["teacher"], methods=['GET'])
+@auth.route(app, "/deleteunit", required_role=["teacher"], methods=['POST'])
 def deleteunit():
-    token = request.args.get('token')
+    user_id = g.get("user_id")
     unit_id = request.args.get('unit_id')
-    return "Unit deleted successfully", 200
+
+    try:
+        with auth.open() as (connection, cursor):
+
+            # Löscht Einträge in lz_unit_pro_klass
+            delete_klass_query = "DELETE FROM lz_unit_pro_klass WHERE unit_id = %s"
+            cursor.execute(delete_klass_query, (unit_id,))
+
+            # verb_id's aus lz_verb_pro_unit mit unit_id
+            get_verbs_query = "SELECT verb_id FROM lz_verb_pro_unit WHERE unit_id = %s"
+            cursor.execute(get_verbs_query, (unit_id,))
+            verb_ids = cursor.fetchall()
+
+            # löscht verben
+            verb_id_list = [v["verb_id"] for v in verb_ids]
+            format_strings = ','.join(['%s'] * len(verb_id_list))
+            cursor.execute(f"DELETE FROM lz_verb WHERE verb_id IN ({format_strings})", tuple(verb_id_list))
+
+            # löscht einträge verb_pro_unit
+            delete_verbs_query = "DELETE FROM lz_verb_pro_unit WHERE unit_id = %s"
+            cursor.execute(delete_verbs_query, (unit_id,))
+
+            # löscht eintrag in unit
+            delete_unit_query = "DELETE FROM lz_unit WHERE unit_id = %s"
+            cursor.execute(delete_unit_query, (unit_id,))
+            connection.commit()
+
+        return jsonify({"success": True, "message": "Unit wurde erfolgreich gelöscht."}), 200
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 
 if __name__ == '__main__':
