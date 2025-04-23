@@ -1,3 +1,5 @@
+from cmd import PROMPT
+
 from flask import Flask, request, jsonify, render_template, g
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
@@ -94,41 +96,20 @@ def tosus():
 
 @app.route('/tenses', methods=['GET'])
 def tenses():
-    user_id = g.get("user_id")
-    try:
-        with auth.open() as (connection, cursor):
-            #department_id von user
-            cursor.execute("SELECT department_id FROM mf_student WHERE id = %s", (user_id,))
-            student = cursor.fetchone()
+    result = {
+        "Présent": True,
+        "Imparfait": True,
+        "Passé composé": True,
+        "Plus-que-parfait": True,
+        "Futur simple": True,
+        "Conditionnel présent": True,
+        "Conditionnel passé": True,
+        "Subjonctif présent": True,
+        "Subjonctif passé": True,
+        "Impératif": True
+    }
+    return jsonify(result)
 
-            if not student:
-                return jsonify({"error": 1, "message": "Student nicht gefunden"}), 404
-
-            department_id = student["department_id"]
-
-            #alle zeitform_id die zur department_id gehören
-            cursor.execute("SELECT zeitform_id FROM lz_zeitform_klasse WHERE klasse_id = %s", (department_id,))
-            zeitform_ids_raw = cursor.fetchall()
-            zeitform_ids = tuple([z["zeitform_id"] for z in zeitform_ids_raw])
-
-            # falls keine Zeitformen gefunden
-            if not zeitform_ids:
-                return jsonify({})
-
-            #alle Zeitformen anhand der zeitform_id
-            if len(zeitform_ids) == 1:
-                cursor.execute("SELECT name FROM lz_zeitform WHERE zeitform_id = %s", (zeitform_ids[0],))
-            else:
-                format_strings = ','.join(['%s'] * len(zeitform_ids))
-                cursor.execute(
-                    f"SELECT name FROM lz_zeitform WHERE zeitform_id IN ({format_strings})",
-                    zeitform_ids
-                )
-            result = cursor.fetchall()
-            print(result)
-            return jsonify(result)
-    except Exception as e:
-        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 @auth.route(app, "/training", required_role=["student"], methods=['GET'])
 def training():
@@ -155,6 +136,7 @@ def training():
         - Verwende die folgenden Verben: {', '.join(verbs)}.
         - Nutze ausschließlich die folgenden Zeitformen und verwende jede mindestens einmal: {', '.join(selected_tenses_list)}.
         - Falls danach noch Sätze übrig sind, wähle die restlichen Zeitformen zufällig aus dieser Liste.
+        - Verwende auf keinen Fall andere Zeitformen als die die ausgewählt wurden.
         - Jeder Satz soll grammatikalisch korrekt sein und eine eindeutige, klar erkennbare Konjugation enthalten.
 
         Erwartetes Ausgabeformat als JSON (Liste mit 10 Objekten, ohne zusätzlichen Text drumherum):
@@ -169,10 +151,11 @@ def training():
           ...
         ]
         """
+        print(prompt)
         # KI-Modell
         response = client.beta.chat.completions.parse(
             model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
+            messages=[{"role": "system", "content": prompt1},{"role": "user", "content": prompt}],
             max_tokens=800,
             temperature=0.7,
         )
