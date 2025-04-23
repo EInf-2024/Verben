@@ -6,6 +6,7 @@ import os
 import openai
 import logging
 import auth
+import traceback
 
 app = Flask(__name__)
 load_dotenv()  # Lädt Variablen aus der .env-Datei
@@ -84,11 +85,13 @@ def tosus():
                 "progress": progress,
                 "units": unit_names
             }
-
+            print(result)
             return jsonify(result)
 
     except Exception as e:
-        return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
+        print("Fehler in /susview:", str(e))
+        traceback.print_exc()
+        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 @app.route('/tenses', methods=['GET'])
 def tenses():
