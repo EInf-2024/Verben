@@ -27,6 +27,7 @@ def index2():
 
 app.route('/login', methods=['POST'])(auth.login)
 
+#gut
 @auth.route(app,"/susview", required_role=["student", "teacher"], methods=['GET'])
 def tosus():
     user_id = g.get("user_id")
@@ -94,6 +95,7 @@ def tosus():
         traceback.print_exc()
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
+#gut
 @app.route('/tenses', methods=['GET'])
 def tenses():
     result = {
@@ -110,7 +112,7 @@ def tenses():
     }
     return jsonify(result)
 
-
+#gut
 @auth.route(app, "/training", required_role=["student"], methods=['GET'])
 def training():
     try:
@@ -174,7 +176,7 @@ def training():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-
+#gut
 @auth.route(app, "/verify", required_role=["student"], methods=["POST"])
 def verify():
     user_id = g.get("user_id")
@@ -256,7 +258,7 @@ def verify():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Fehler beim Speichern des Fortschritts: {str(e)}"}), 500
 
-
+#gut
 @auth.route(app, "/lpview", required_role=["teacher"], methods=['GET'])
 def tolp():
     user_id = g.get("user_id")
@@ -306,6 +308,7 @@ def tolp():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
+#gut
 @auth.route(app, "/lpclass", required_role=["teacher"], methods=['GET'])
 def lpclass():
     user_id = g.get("user_id")
@@ -342,6 +345,7 @@ def lpclass():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
 
+#!!!! funktioniert nicht!!!
 @auth.route(app, "/upload", required_role=["teacher"], methods=["POST"])
 def upload():
     try:
@@ -363,7 +367,7 @@ def upload():
         # KI-Prompt
         prompt = f"""
         Hier ist eine Liste von französischen Verben (Infinitivform). Bitte gib diese als JSON-Dictionary zurück, 
-        nummeriert ab 1, in folgendem Format: 
+        nummeriert ab 1, in folgendem Beispielformat das ausschliesslich als Beispiel fungieren soll: 
         {{'1': 'manger', '2': 'parler', '3': 'aller', ...}}.
 
         Wichtig:
@@ -394,7 +398,7 @@ def upload():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Fehler beim Hochladen oder Verarbeiten: {str(e)}"}), 500
 
-
+#gut
 @auth.route(app, "/getunit", required_role=["teacher"], methods=["GET"])
 def getunit():
     user_id = g.get("user_id")
@@ -449,15 +453,64 @@ def getunit():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-#Neue Infos wie unit_name, klassen, verben etc erstellen und an Datenbank geben
-@auth.route(app,"/createunit", required_role=["teacher"], methods=['POST'])
+#unsicher ob es funktioniert da upload nicht funktioniert
+@auth.route(app, "/createunit", required_role=["teacher"], methods=["POST"])
 def createunit():
-    data = request.get_json()  # Get JSON data
-    new_unit = data.get("unit")
-    print(new_unit['verbs'])
-    print(new_unit['unit_name'])
-    print(new_unit['selected_classes'])
-    return '', 204
+    try:
+        data = request.get_json()
+        verbs = data.get("unit", {}).get("verbs", [])
+        unit_name = data.get("unit", {}).get("unit_name", "")
+        selected_classes = data.get("unit", {}).get("selected_classes", [])
+
+        if not verbs or not unit_name or not selected_classes:
+            return jsonify({"error": 1, "message": "Fehlende Eingabedaten"}), 400
+
+        with auth.open() as (connection, cursor):
+            # 1. Neue Unit erstellen
+            cursor.execute("INSERT INTO lz_unit (unit_name) VALUES (%s) RETURNING unit_id", (unit_name,))
+            new_unit_id = cursor.fetchone()["unit_id"]
+
+            # 2. IDs der ausgewählten Klassen anhand der Labels holen
+            format_strings = ','.join(['%s'] * len(selected_classes))
+            cursor.execute(
+                f"SELECT id FROM mf_department WHERE label IN ({format_strings})",
+                tuple(selected_classes)
+            )
+            class_ids_raw = cursor.fetchall()
+            class_ids = [row["id"] for row in class_ids_raw]
+
+            # 3. Neue Einträge in lz_unit_pro_klass erstellen
+            for class_id in class_ids:
+                cursor.execute(
+                    "INSERT INTO lz_unit_pro_klass (klasse_id, unit_id) VALUES (%s, %s)",
+                    (class_id, new_unit_id)
+                )
+
+            # 4. Verben in lz_verb speichern
+            verb_ids = []
+            for verb in verbs:
+                cursor.execute(
+                    "INSERT INTO lz_verb (verb) VALUES (%s) RETURNING verb_id",
+                    (verb,)
+                )
+                verb_id = cursor.fetchone()["verb_id"]
+                verb_ids.append(verb_id)
+
+            # 5. Verknüpfung zwischen Verben und Unit speichern
+            for verb_id in verb_ids:
+                cursor.execute(
+                    "INSERT INTO lz_verb_pro_unit (unit_id, verb_id) VALUES (%s, %s)",
+                    (new_unit_id, verb_id)
+                )
+
+            # Alles speichern
+            connection.commit()
+
+        return jsonify({"error": 0, "message": "Unit erfolgreich erstellt"}), 201
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
+
 
 #unit welche schon erstellt sind, einzelne verben löschen/ hinzugefügen, klassen zuordnen, name verändern
 @auth.route(app,"/saveunit", required_role=["teacher"], methods=['POST'])
