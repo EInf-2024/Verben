@@ -130,17 +130,13 @@ def training():
             cursor.execute(f"SELECT verb FROM lz_verb WHERE verb_id IN ({format_strings})", tuple(verb_ids))
             verbs = [row["verb"] for row in cursor.fetchall()]
 
-        prompt1= f"""
-        system Prompt
-"""
 
         # Prompt für  KI
         prompt = f"""
         Du bist ein Französischlehrer. Erstelle genau 10 französische Lückensätze, um die Konjugation zu üben.
         - Verwende die folgenden Verben: {', '.join(verbs)}.
         - Nutze ausschließlich die folgenden Zeitformen und verwende jede mindestens einmal: {', '.join(selected_tenses_list)}.
-        - Falls danach noch Sätze übrig sind, wähle die restlichen Zeitformen zufällig aus dieser Liste.
-        - Verwende auf keinen Fall andere Zeitformen als die die ausgewählt wurden.
+        - Verwende auf keinen Fall andere Zeitformen als die die ich dir vorgegeben habe.
         - Jeder Satz soll grammatikalisch korrekt sein und eine eindeutige, klar erkennbare Konjugation enthalten.
 
         Erwartetes Ausgabeformat als JSON (Liste mit 10 Objekten, ohne zusätzlichen Text drumherum):
@@ -155,11 +151,10 @@ def training():
           ...
         ]
         """
-        print(prompt)
         # KI-Modell
         response = client.beta.chat.completions.parse(
             model="gpt-4o-mini",
-            messages=[{"role": "system", "content": prompt1},{"role": "user", "content": prompt}],
+            messages=[{"role": "user", "content": prompt}],
             max_tokens=800,
             temperature=0.7,
         )
@@ -179,7 +174,7 @@ def training():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-#Score des Schülers in datenbank speichern
+
 @auth.route(app, "/verify", required_role=["student"], methods=["POST"])
 def verify():
     user_id = g.get("user_id")
