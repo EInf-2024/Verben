@@ -130,6 +130,10 @@ def training():
             cursor.execute(f"SELECT verb FROM lz_verb WHERE verb_id IN ({format_strings})", tuple(verb_ids))
             verbs = [row["verb"] for row in cursor.fetchall()]
 
+        prompt1= f"""
+        system Prompt
+"""
+
         # Prompt für  KI
         prompt = f"""
         Du bist ein Französischlehrer. Erstelle genau 10 französische Lückensätze, um die Konjugation zu üben.
@@ -176,13 +180,86 @@ def training():
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 #Score des Schülers in datenbank speichern
-@auth.route(app,"/verify", required_role=["student"], methods=['POST'])
+@auth.route(app, "/verify", required_role=["student"], methods=["POST"])
 def verify():
-    data = request.get_json()  # Get JSON data
-    score = data.get("score")  # Extract "score" object
-    print("Received Score:", score)  # Debugging
-    print(score["Imparfait"])
-    return '', 204  # 204 No Content (no response needed)
+    user_id = g.get("user_id")
+    data = request.get_json()
+    score = data.get("score")  # {"Présent": [0,0], ...}
+
+    if not score:
+        return jsonify({"error": 1, "message": "Kein Score-Daten erhalten."}), 400
+
+    try:
+        with auth.open() as (connection, cursor):
+            # Prüfen ob Fortschrittseintrag existiert
+            cursor.execute("SELECT * FROM lz_fortschritt WHERE user_id = %s", (user_id,))
+            existing = cursor.fetchone()
+
+            # Mapping von Zeitform-Namen auf Datenbank-Spaltennamen
+            zeitform_mapping = {
+                "Présent": ("present_right", "present_all"),
+                "Passé composé": ("passe_compose_right", "passe_compose_all"),
+                "Imparfait": ("imparfait_right", "imparfait_all"),
+                "Plus-que-parfait": ("plus-que-parfait_right", "plus-que-parfait_all"),
+                "Futur simple": ("futur_simple_right", "futur_simple_all"),
+                "Conditionnel présent": ("conditionnel_present_right", "conditionnel_present_all"),
+                "Conditionnel passé": ("conditionnel_passe_right", "conditionnel_passe_all"),
+                "Subjonctif présent": ("subjonctif_present_right", "subjonctif_present_all"),
+                "Subjonctif passé": ("subjonctif_passe_right", "subjonctif_passe_all"),
+                "Impératif": ("imperatif_right", "imperatif_all")
+            }
+
+            if existing:
+                # UPDATE: Bestehende Werte addieren
+                update_fields = []
+                update_values = []
+
+                for zeitform, (right_field, all_field) in zeitform_mapping.items():
+                    right, all_ = score.get(zeitform, (0, 0))
+
+                    if all_ == 0:
+                        continue  # Zeitform nicht geübt → überspringen
+
+                    update_fields.append(f"{right_field} = {right_field} + %s")
+                    update_values.append(right)
+
+                    update_fields.append(f"{all_field} = {all_field} + %s")
+                    update_values.append(all_)
+
+                if update_fields:
+                    sql_update = f"UPDATE lz_fortschritt SET {', '.join(update_fields)} WHERE user_id = %s"
+                    cursor.execute(sql_update, (*update_values, user_id))
+                    connection.commit()
+
+            else:
+                # INSERT: Neue Zeile anlegen
+                columns = ["user_id"]
+                values = [user_id]
+                placeholders = ["%s"]
+
+                for zeitform, (right_field, all_field) in zeitform_mapping.items():
+                    right, all_ = score.get(zeitform, (0, 0))
+
+                    if all_ == 0:
+                        continue  # Zeitform nicht geübt → überspringen
+
+                    columns.append(right_field)
+                    placeholders.append("%s")
+                    values.append(right)
+
+                    columns.append(all_field)
+                    placeholders.append("%s")
+                    values.append(all_)
+
+                if len(columns) > 1:  # Es gibt was zum Einfügen
+                    sql_insert = f"INSERT INTO lz_fortschritt ({', '.join(columns)}) VALUES ({', '.join(placeholders)})"
+                    cursor.execute(sql_insert, tuple(values))
+                    connection.commit()
+
+        return '', 204  # Erfolg, keine Antwort nötig
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Fehler beim Speichern des Fortschritts: {str(e)}"}), 500
 
 
 @auth.route(app, "/lpview", required_role=["teacher"], methods=['GET'])
