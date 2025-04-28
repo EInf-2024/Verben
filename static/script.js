@@ -515,19 +515,27 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
     }
 });
 
-
 // sets up the training view
 document.getElementById("start-training-button").addEventListener("click",function (){
-    document.getElementById('start-training-button').classList.add('d-none')
+
     const selectedTenses = [...document.querySelectorAll('input[name="tense"]:checked')]
         .map(checkbox => checkbox.value);
     const selected_unit = document.getElementById('navbar').getAttribute('selected_unit')
+
+    // puts up the loading screen as long as it takes for the fetch to return data
+    toExercise()
+    document.getElementById('start-training-button').classList.add('d-none')
+    document.getElementById('exercise-view').innerHTML = ``
+    document.getElementById('loading-screen').classList.remove('d-none')
+    document.getElementById('exercise-view').classList.add('d-none')
+    document.getElementById('home-button').classList.add('d-none')
+    document.getElementById('check-answers-button').classList.add('d-none')
+
 
     // creates the sentences that are sent back by flask
     fetch(`/training?token=${encodeURIComponent(token)}&tenses=${encodeURIComponent(selectedTenses.join(','))}&unit=${encodeURIComponent(selected_unit)}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById('exercise-view').innerHTML = ``
             for (const sentence of data) {
                 const sentence_container = document.createElement('div');
                 sentence_container.classList.add('gap-sentence');
@@ -544,11 +552,21 @@ document.getElementById("start-training-button").addEventListener("click",functi
 
             }
         })
-    .catch(error => console.error('Fehler', error))
-    document.getElementById("check-answers-button").setAttribute("clicked",0)
-    toExercise()
+    .catch(error =>console.error('Fehler', error))
+    .finally(() => {
+            // Hide loading screen and show content
+            document.getElementById('loading-screen').classList.add('d-none');
+            document.getElementById('exercise-view').classList.remove('d-none');
+            document.getElementById('check-answers-button').classList.remove('d-none')
+            document.getElementById('home-button').classList.remove('d-none')
+            document.getElementById("check-answers-button").setAttribute("clicked",0)
+        });
 });
 
+
+function loadExercises (){
+
+}
 
 
 // corrects the sentences and sends back the results
