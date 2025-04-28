@@ -1,3 +1,5 @@
+from cmd import PROMPT
+
 from flask import Flask, request, jsonify, render_template, g
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
@@ -25,6 +27,7 @@ def index2():
 
 app.route('/login', methods=['POST'])(auth.login)
 
+#gut
 @auth.route(app,"/susview", required_role=["student", "teacher"], methods=['GET'])
 def tosus():
     user_id = g.get("user_id")
@@ -92,44 +95,24 @@ def tosus():
         traceback.print_exc()
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
+#gut
 @app.route('/tenses', methods=['GET'])
 def tenses():
-    user_id = g.get("user_id")
-    try:
-        with auth.open() as (connection, cursor):
-            #department_id von user
-            cursor.execute("SELECT department_id FROM mf_student WHERE id = %s", (user_id,))
-            student = cursor.fetchone()
+    result = {
+        "Présent": True,
+        "Imparfait": True,
+        "Passé composé": True,
+        "Plus-que-parfait": True,
+        "Futur simple": True,
+        "Conditionnel présent": True,
+        "Conditionnel passé": True,
+        "Subjonctif présent": True,
+        "Subjonctif passé": True,
+        "Impératif": True
+    }
+    return jsonify(result)
 
-            if not student:
-                return jsonify({"error": 1, "message": "Student nicht gefunden"}), 404
-
-            department_id = student["department_id"]
-
-            #alle zeitform_id die zur department_id gehören
-            cursor.execute("SELECT zeitform_id FROM lz_zeitform_klasse WHERE klasse_id = %s", (department_id,))
-            zeitform_ids_raw = cursor.fetchall()
-            zeitform_ids = tuple([z["zeitform_id"] for z in zeitform_ids_raw])
-
-            # falls keine Zeitformen gefunden
-            if not zeitform_ids:
-                return jsonify({})
-
-            #alle Zeitformen anhand der zeitform_id
-            if len(zeitform_ids) == 1:
-                cursor.execute("SELECT name FROM lz_zeitform WHERE zeitform_id = %s", (zeitform_ids[0],))
-            else:
-                format_strings = ','.join(['%s'] * len(zeitform_ids))
-                cursor.execute(
-                    f"SELECT name FROM lz_zeitform WHERE zeitform_id IN ({format_strings})",
-                    zeitform_ids
-                )
-            result = cursor.fetchall()
-            print(result)
-            return jsonify(result)
-    except Exception as e:
-        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
-
+#gut
 @auth.route(app, "/training", required_role=["student"], methods=['GET'])
 def training():
     try:
@@ -149,12 +132,13 @@ def training():
             cursor.execute(f"SELECT verb FROM lz_verb WHERE verb_id IN ({format_strings})", tuple(verb_ids))
             verbs = [row["verb"] for row in cursor.fetchall()]
 
+
         # Prompt für  KI
         prompt = f"""
         Du bist ein Französischlehrer. Erstelle genau 10 französische Lückensätze, um die Konjugation zu üben.
         - Verwende die folgenden Verben: {', '.join(verbs)}.
         - Nutze ausschließlich die folgenden Zeitformen und verwende jede mindestens einmal: {', '.join(selected_tenses_list)}.
-        - Falls danach noch Sätze übrig sind, wähle die restlichen Zeitformen zufällig aus dieser Liste.
+        - Verwende auf keinen Fall andere Zeitformen als die die ich dir vorgegeben habe.
         - Jeder Satz soll grammatikalisch korrekt sein und eine eindeutige, klar erkennbare Konjugation enthalten.
 
         Erwartetes Ausgabeformat als JSON (Liste mit 10 Objekten, ohne zusätzlichen Text drumherum):
@@ -192,16 +176,89 @@ def training():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-#Score des Schülers in datenbank speichern
-@auth.route(app,"/verify", required_role=["student"], methods=['POST'])
+#gut
+@auth.route(app, "/verify", required_role=["student"], methods=["POST"])
 def verify():
-    data = request.get_json()  # Get JSON data
-    score = data.get("score")  # Extract "score" object
-    print("Received Score:", score)  # Debugging
-    print(score["Imparfait"])
-    return '', 204  # 204 No Content (no response needed)
+    user_id = g.get("user_id")
+    data = request.get_json()
+    score = data.get("score")  # {"Présent": [0,0], ...}
 
+    if not score:
+        return jsonify({"error": 1, "message": "Kein Score-Daten erhalten."}), 400
 
+    try:
+        with auth.open() as (connection, cursor):
+            # Prüfen ob Fortschrittseintrag existiert
+            cursor.execute("SELECT * FROM lz_fortschritt WHERE user_id = %s", (user_id,))
+            existing = cursor.fetchone()
+
+            # Mapping von Zeitform-Namen auf Datenbank-Spaltennamen
+            zeitform_mapping = {
+                "Présent": ("present_right", "present_all"),
+                "Passé composé": ("passe_compose_right", "passe_compose_all"),
+                "Imparfait": ("imparfait_right", "imparfait_all"),
+                "Plus-que-parfait": ("plus-que-parfait_right", "plus-que-parfait_all"),
+                "Futur simple": ("futur_simple_right", "futur_simple_all"),
+                "Conditionnel présent": ("conditionnel_present_right", "conditionnel_present_all"),
+                "Conditionnel passé": ("conditionnel_passe_right", "conditionnel_passe_all"),
+                "Subjonctif présent": ("subjonctif_present_right", "subjonctif_present_all"),
+                "Subjonctif passé": ("subjonctif_passe_right", "subjonctif_passe_all"),
+                "Impératif": ("imperatif_right", "imperatif_all")
+            }
+
+            if existing:
+                # UPDATE: Bestehende Werte addieren
+                update_fields = []
+                update_values = []
+
+                for zeitform, (right_field, all_field) in zeitform_mapping.items():
+                    right, all_ = score.get(zeitform, (0, 0))
+
+                    if all_ == 0:
+                        continue  # Zeitform nicht geübt → überspringen
+
+                    update_fields.append(f"{right_field} = {right_field} + %s")
+                    update_values.append(right)
+
+                    update_fields.append(f"{all_field} = {all_field} + %s")
+                    update_values.append(all_)
+
+                if update_fields:
+                    sql_update = f"UPDATE lz_fortschritt SET {', '.join(update_fields)} WHERE user_id = %s"
+                    cursor.execute(sql_update, (*update_values, user_id))
+                    connection.commit()
+
+            else:
+                # INSERT: Neue Zeile anlegen
+                columns = ["user_id"]
+                values = [user_id]
+                placeholders = ["%s"]
+
+                for zeitform, (right_field, all_field) in zeitform_mapping.items():
+                    right, all_ = score.get(zeitform, (0, 0))
+
+                    if all_ == 0:
+                        continue  # Zeitform nicht geübt → überspringen
+
+                    columns.append(right_field)
+                    placeholders.append("%s")
+                    values.append(right)
+
+                    columns.append(all_field)
+                    placeholders.append("%s")
+                    values.append(all_)
+
+                if len(columns) > 1:  # Es gibt was zum Einfügen
+                    sql_insert = f"INSERT INTO lz_fortschritt ({', '.join(columns)}) VALUES ({', '.join(placeholders)})"
+                    cursor.execute(sql_insert, tuple(values))
+                    connection.commit()
+
+        return '', 204  # Erfolg, keine Antwort nötig
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Fehler beim Speichern des Fortschritts: {str(e)}"}), 500
+
+#gut
 @auth.route(app, "/lpview", required_role=["teacher"], methods=['GET'])
 def tolp():
     user_id = g.get("user_id")
@@ -251,6 +308,7 @@ def tolp():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
+#gut
 @auth.route(app, "/lpclass", required_role=["teacher"], methods=['GET'])
 def lpclass():
     user_id = g.get("user_id")
@@ -287,6 +345,7 @@ def lpclass():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
 
+#!!!! funktioniert nicht!!!
 @auth.route(app, "/upload", required_role=["teacher"], methods=["POST"])
 def upload():
     try:
@@ -308,7 +367,7 @@ def upload():
         # KI-Prompt
         prompt = f"""
         Hier ist eine Liste von französischen Verben (Infinitivform). Bitte gib diese als JSON-Dictionary zurück, 
-        nummeriert ab 1, in folgendem Format: 
+        nummeriert ab 1, in folgendem Beispielformat das ausschliesslich als Beispiel fungieren soll: 
         {{'1': 'manger', '2': 'parler', '3': 'aller', ...}}.
 
         Wichtig:
@@ -339,7 +398,7 @@ def upload():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Fehler beim Hochladen oder Verarbeiten: {str(e)}"}), 500
 
-
+#gut
 @auth.route(app, "/getunit", required_role=["teacher"], methods=["GET"])
 def getunit():
     user_id = g.get("user_id")
@@ -394,15 +453,64 @@ def getunit():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-#Neue Infos wie unit_name, klassen, verben etc erstellen und an Datenbank geben
-@auth.route(app,"/createunit", required_role=["teacher"], methods=['POST'])
+#unsicher ob es funktioniert da upload nicht funktioniert
+@auth.route(app, "/createunit", required_role=["teacher"], methods=["POST"])
 def createunit():
-    data = request.get_json()  # Get JSON data
-    new_unit = data.get("unit")
-    print(new_unit['verbs'])
-    print(new_unit['unit_name'])
-    print(new_unit['selected_classes'])
-    return '', 204
+    try:
+        data = request.get_json()
+        verbs = data.get("unit", {}).get("verbs", [])
+        unit_name = data.get("unit", {}).get("unit_name", "")
+        selected_classes = data.get("unit", {}).get("selected_classes", [])
+
+        if not verbs or not unit_name or not selected_classes:
+            return jsonify({"error": 1, "message": "Fehlende Eingabedaten"}), 400
+
+        with auth.open() as (connection, cursor):
+            # 1. Neue Unit erstellen
+            cursor.execute("INSERT INTO lz_unit (unit_name) VALUES (%s) RETURNING unit_id", (unit_name,))
+            new_unit_id = cursor.fetchone()["unit_id"]
+
+            # 2. IDs der ausgewählten Klassen anhand der Labels holen
+            format_strings = ','.join(['%s'] * len(selected_classes))
+            cursor.execute(
+                f"SELECT id FROM mf_department WHERE label IN ({format_strings})",
+                tuple(selected_classes)
+            )
+            class_ids_raw = cursor.fetchall()
+            class_ids = [row["id"] for row in class_ids_raw]
+
+            # 3. Neue Einträge in lz_unit_pro_klass erstellen
+            for class_id in class_ids:
+                cursor.execute(
+                    "INSERT INTO lz_unit_pro_klass (klasse_id, unit_id) VALUES (%s, %s)",
+                    (class_id, new_unit_id)
+                )
+
+            # 4. Verben in lz_verb speichern
+            verb_ids = []
+            for verb in verbs:
+                cursor.execute(
+                    "INSERT INTO lz_verb (verb) VALUES (%s) RETURNING verb_id",
+                    (verb,)
+                )
+                verb_id = cursor.fetchone()["verb_id"]
+                verb_ids.append(verb_id)
+
+            # 5. Verknüpfung zwischen Verben und Unit speichern
+            for verb_id in verb_ids:
+                cursor.execute(
+                    "INSERT INTO lz_verb_pro_unit (unit_id, verb_id) VALUES (%s, %s)",
+                    (new_unit_id, verb_id)
+                )
+
+            # Alles speichern
+            connection.commit()
+
+        return jsonify({"error": 0, "message": "Unit erfolgreich erstellt"}), 201
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
+
 
 #unit welche schon erstellt sind, einzelne verben löschen/ hinzugefügen, klassen zuordnen, name verändern
 @auth.route(app,"/saveunit", required_role=["teacher"], methods=['POST'])
