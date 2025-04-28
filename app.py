@@ -512,6 +512,89 @@ def createunit():
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 
+@auth.route(app, "/saveunit", required_role=["teacher"], methods=['POST'])
+def saveunit():
+    try:
+        data = request.get_json()
+        new_unit = data.get("unit")
+        verbs = new_unit['verbs']
+        unit_name = new_unit['unit_name']
+        unit_id = new_unit['unit_id']
+        selected_classes = new_unit['selected_classes']
+
+        with auth.open() as (connection, cursor):
+
+            ### 1. Unit Name prüfen und ggf. aktualisieren
+            cursor.execute("SELECT unit_name FROM lz_unit WHERE unit_id = %s", (unit_id,))
+            existing_unit = cursor.fetchone()
+
+            if existing_unit and existing_unit['unit_name'] != unit_name:
+                cursor.execute(
+                    "UPDATE lz_unit SET unit_name = %s WHERE unit_id = %s",
+                    (unit_name, unit_id)
+                )
+
+            ### 2. Alle Klassen-IDs anhand Labels finden
+            format_strings = ','.join(['%s'] * len(selected_classes))
+            cursor.execute(
+                f"SELECT id, label FROM mf_department WHERE label IN ({format_strings})",
+                tuple(selected_classes)
+            )
+            class_results = cursor.fetchall()
+            selected_class_ids = [row['id'] for row in class_results]
+
+            ### 3. Verbindungen Unit <-> Klassen prüfen und ergänzen
+            cursor.execute("SELECT klasse_id FROM lz_unit_pro_klass WHERE unit_id = %s", (unit_id,))
+            existing_class_ids = [row['klasse_id'] for row in cursor.fetchall()]
+
+            for class_id in selected_class_ids:
+                if class_id not in existing_class_ids:
+                    cursor.execute(
+                        "INSERT INTO lz_unit_pro_klass (klasse_id, unit_id) VALUES (%s, %s)",
+                        (class_id, unit_id)
+                    )
+
+            ### 4. Verben prüfen, neue Verben speichern
+            verb_ids = []
+
+            if verbs:
+                format_strings = ','.join(['%s'] * len(verbs))
+                cursor.execute(
+                    f"SELECT verb_id, verb FROM lz_verb WHERE verb IN ({format_strings})",
+                    tuple(verbs)
+                )
+                existing_verbs = {row['verb']: row['verb_id'] for row in cursor.fetchall()}
+
+                for verb in verbs:
+                    if verb in existing_verbs:
+                        verb_ids.append(existing_verbs[verb])
+                    else:
+                        cursor.execute(
+                            "INSERT INTO lz_verb (verb) VALUES (%s) RETURNING verb_id",
+                            (verb,)
+                        )
+                        new_verb_id = cursor.fetchone()['verb_id']
+                        verb_ids.append(new_verb_id)
+
+            ### 5. Verbindungen Unit <-> Verben prüfen und ergänzen
+            cursor.execute("SELECT verb_id FROM lz_verb_pro_unit WHERE unit_id = %s", (unit_id,))
+            existing_verb_ids = [row['verb_id'] for row in cursor.fetchall()]
+
+            for verb_id in verb_ids:
+                if verb_id not in existing_verb_ids:
+                    cursor.execute(
+                        "INSERT INTO lz_verb_pro_unit (unit_id, verb_id) VALUES (%s, %s)",
+                        (unit_id, verb_id)
+                    )
+
+            connection.commit()
+            return '', 204
+
+    except Exception as e:
+        return jsonify({"error": 1, "message": f"Interner Fehler beim Speichern der Unit: {str(e)}"}), 500
+
+
+
 #unit welche schon erstellt sind, einzelne verben löschen/ hinzugefügen, klassen zuordnen, name verändern
 @auth.route(app,"/saveunit", required_role=["teacher"], methods=['POST'])
 def saveunit():
