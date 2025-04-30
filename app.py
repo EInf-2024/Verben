@@ -363,6 +363,7 @@ def upload():
 
         #  PDF + Text
         full_text = "\n".join([text] + pdf_texts)
+        print(full_text)
 
         # KI-Prompt
         prompt = f"""
@@ -391,11 +392,13 @@ def upload():
         try:
             verbs = json.loads(raw_output)
         except Exception:
+            traceback.print_exc()
             verbs = {"error": "Formatierung konnte nicht gelesen werden", "raw": raw_output}
 
         return jsonify({'verbs': verbs})
 
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": 1, "message": f"Fehler beim Hochladen oder Verarbeiten: {str(e)}"}), 500
 
 #gut
@@ -453,7 +456,7 @@ def getunit():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-#unsicher ob es funktioniert da upload nicht funktioniert
+#funktioniert nicht
 @auth.route(app, "/createunit", required_role=["teacher"], methods=["POST"])
 def createunit():
     try:
@@ -509,9 +512,10 @@ def createunit():
         return jsonify({"error": 0, "message": "Unit erfolgreich erstellt"}), 201
 
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
-
+#funktioniert nicht
 @auth.route(app, "/saveunit", required_role=["teacher"], methods=['POST'])
 def saveunit():
     try:
@@ -521,7 +525,6 @@ def saveunit():
         unit_name = new_unit['unit_name']
         unit_id = new_unit['unit_id']
         selected_classes = new_unit['selected_classes']
-
         with auth.open() as (connection, cursor):
 
             ### 1. Unit Name prüfen und ggf. aktualisieren
@@ -591,26 +594,14 @@ def saveunit():
             return '', 204
 
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": 1, "message": f"Interner Fehler beim Speichern der Unit: {str(e)}"}), 500
 
-
-
-#unit welche schon erstellt sind, einzelne verben löschen/ hinzugefügen, klassen zuordnen, name verändern
-@auth.route(app,"/saveunit", required_role=["teacher"], methods=['POST'])
-def saveunit():
-    data = request.get_json()  # Get JSON data
-    new_unit = data.get("unit")
-    print(new_unit['verbs'])
-    print(new_unit['unit_name'])
-    print(new_unit['unit_id'])
-    print(new_unit['selected_classes'])
-    return '', 204
-
+#funktioniert nicht
 @auth.route(app, "/deleteunit", required_role=["teacher"], methods=['POST'])
 def deleteunit():
-    user_id = g.get("user_id")
-    unit_id = request.args.get('unit_id')
-
+    data = request.get_json()
+    unit_id = data.get('unit_id')
     try:
         with auth.open() as (connection, cursor):
 
@@ -639,6 +630,8 @@ def deleteunit():
 
         return jsonify({"success": True, "message": "Unit wurde erfolgreich gelöscht."}), 200
     except Exception as e:
+        print("Fehler in /deletunit:", str(e))
+        traceback.print_exc()
         return jsonify({"error": 1, "message": f"Interner Fehler: {str(e)}"}), 500
 
 
