@@ -7,6 +7,11 @@ import json
 import os
 import openai
 import logging
+from pydantic import BaseModel
+from typing import List
+
+from openai import BaseModel
+
 import auth
 import traceback
 
@@ -345,7 +350,7 @@ def lpclass():
     except Exception as e:
         return jsonify({"error": 1, "message": f"Interner Fehler : {str(e)}"}), 500
 
-#!!!! funktioniert nicht!!!
+#gut
 @auth.route(app, "/upload", required_role=["teacher"], methods=["POST"])
 def upload():
     try:
@@ -363,7 +368,8 @@ def upload():
 
         #  PDF + Text
         full_text = "\n".join([text] + pdf_texts)
-        print(full_text)
+
+
 
         # KI-Prompt
         prompt = f"""
@@ -385,9 +391,9 @@ def upload():
             messages=[{"role": "user", "content": prompt}],
             max_tokens=500,
             temperature=0.2,
+            response_format={"type": "json_object"}
         )
         raw_output = response.choices[0].message.content.strip()
-
         # Versuch, die Ausgabe als JSON zu laden
         try:
             verbs = json.loads(raw_output)
@@ -399,7 +405,7 @@ def upload():
 
     except Exception as e:
         traceback.print_exc()
-        return jsonify({"error": 1, "message": f"Fehler beim Hochladen oder Verarbeiten: {str(e)}"}), 500
+    return jsonify({"error": 1, "message": f"Fehler beim Hochladen oder Verarbeiten: {str(e)}"}), 500
 
 #gut
 @auth.route(app, "/getunit", required_role=["teacher"], methods=["GET"])
@@ -462,25 +468,19 @@ def createunit():
     try:
         data = request.get_json()
         verbs = data.get("unit", {}).get("verbs", [])
+        print(verbs)
         unit_name = data.get("unit", {}).get("unit_name", "")
-        selected_classes = data.get("unit", {}).get("selected_classes", [])
+        print(unit_name)
+        class_ids = data.get("unit", {}).get("selected_classes", [])
+        print(class_ids)
 
-        if not verbs or not unit_name or not selected_classes:
+        if not verbs or not unit_name or not class_ids:
             return jsonify({"error": 1, "message": "Fehlende Eingabedaten"}), 400
 
         with auth.open() as (connection, cursor):
             # 1. Neue Unit erstellen
-            cursor.execute("INSERT INTO lz_unit (unit_name) VALUES (%s) RETURNING unit_id", (unit_name,))
-            new_unit_id = cursor.fetchone()["unit_id"]
-
-            # 2. IDs der ausgewählten Klassen anhand der Labels holen
-            format_strings = ','.join(['%s'] * len(selected_classes))
-            cursor.execute(
-                f"SELECT id FROM mf_department WHERE label IN ({format_strings})",
-                tuple(selected_classes)
-            )
-            class_ids_raw = cursor.fetchall()
-            class_ids = [row["id"] for row in class_ids_raw]
+            cursor.execute("INSERT INTO lz_unit (unit_name) VALUES (%s)", (unit_name,))
+            new_unit_id = cursor.lastrowid
 
             # 3. Neue Einträge in lz_unit_pro_klass erstellen
             for class_id in class_ids:
@@ -493,10 +493,9 @@ def createunit():
             verb_ids = []
             for verb in verbs:
                 cursor.execute(
-                    "INSERT INTO lz_verb (verb) VALUES (%s) RETURNING verb_id",
-                    (verb,)
+                    "INSERT INTO lz_verb (verb) VALUES (%s)", (verb,)
                 )
-                verb_id = cursor.fetchone()["verb_id"]
+                verb_id = cursor.lastrowid
                 verb_ids.append(verb_id)
 
             # 5. Verknüpfung zwischen Verben und Unit speichern
@@ -524,7 +523,7 @@ def saveunit():
         verbs = new_unit['verbs']
         unit_name = new_unit['unit_name']
         unit_id = new_unit['unit_id']
-        selected_classes = new_unit['selected_classes']
+        class_ids = new_unit['selected_classes']
         with auth.open() as (connection, cursor):
 
             ### 1. Unit Name prüfen und ggf. aktualisieren
@@ -537,20 +536,11 @@ def saveunit():
                     (unit_name, unit_id)
                 )
 
-            ### 2. Alle Klassen-IDs anhand Labels finden
-            format_strings = ','.join(['%s'] * len(selected_classes))
-            cursor.execute(
-                f"SELECT id, label FROM mf_department WHERE label IN ({format_strings})",
-                tuple(selected_classes)
-            )
-            class_results = cursor.fetchall()
-            selected_class_ids = [row['id'] for row in class_results]
-
             ### 3. Verbindungen Unit <-> Klassen prüfen und ergänzen
             cursor.execute("SELECT klasse_id FROM lz_unit_pro_klass WHERE unit_id = %s", (unit_id,))
             existing_class_ids = [row['klasse_id'] for row in cursor.fetchall()]
 
-            for class_id in selected_class_ids:
+            for class_id in class_ids:
                 if class_id not in existing_class_ids:
                     cursor.execute(
                         "INSERT INTO lz_unit_pro_klass (klasse_id, unit_id) VALUES (%s, %s)",
@@ -573,11 +563,11 @@ def saveunit():
                         verb_ids.append(existing_verbs[verb])
                     else:
                         cursor.execute(
-                            "INSERT INTO lz_verb (verb) VALUES (%s) RETURNING verb_id",
-                            (verb,)
+                            "INSERT INTO lz_verb (verb) VALUES (%s)",(verb,)
                         )
-                        new_verb_id = cursor.fetchone()['verb_id']
+                        new_verb_id = cursor.lastrowid
                         verb_ids.append(new_verb_id)
+
 
             ### 5. Verbindungen Unit <-> Verben prüfen und ergänzen
             cursor.execute("SELECT verb_id FROM lz_verb_pro_unit WHERE unit_id = %s", (unit_id,))
@@ -600,8 +590,9 @@ def saveunit():
 #funktioniert nicht
 @auth.route(app, "/deleteunit", required_role=["teacher"], methods=['POST'])
 def deleteunit():
-    data = request.get_json()
-    unit_id = data.get('unit_id')
+    unit_id = request.args.get('unit_id')
+    print(unit_id)
+
     try:
         with auth.open() as (connection, cursor):
 
