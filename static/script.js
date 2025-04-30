@@ -360,7 +360,7 @@ document.getElementById('save-btn').addEventListener('click',function(){
     fetch("/saveunit", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ unit: encodeURIComponent(unit) }) // Send the entire object
+        body: JSON.stringify({ unit: unit}) // Send the entire object
     })
     .then(response => {
         if (!response.ok) {
@@ -384,11 +384,12 @@ document.getElementById("add-file-btn").addEventListener("click", () => {
 
 // Handle file selection
 document.getElementById('file-input').addEventListener('change', function(event) {
-    const file = event.target.files[0]; // Get the single selected file
+    selectedFiles = Array.from(event.target.files); // Store all selected files
     const fileList = document.getElementById('file-list');
 
-    fileList.innerHTML = file ? `<li>${file.name}</li>` : '';
+    fileList.innerHTML = selectedFiles.map(file => `<li>${file.name}</li>`).join('');
 });
+
 
 
 
