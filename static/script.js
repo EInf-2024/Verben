@@ -88,6 +88,7 @@ document.getElementById("login-button").addEventListener("click",function (){
 
 // function that leads to the LP view container
 function lpView(){
+
     // clear edit view items
     document.getElementById('verb-list').innerHTML= ``
     document.getElementById('unit-name').value= ``
@@ -411,8 +412,8 @@ document.getElementById('add-btn').addEventListener('click', function() {
     })
     .then(response => response.json())
     .then(data => {
+        console.log(data)
         for (const verb in data.verbs){
-
             console.log(verb)
             console.log(data.verbs[verb])
             const verb_container = document.createElement('li');

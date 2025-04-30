@@ -165,13 +165,13 @@ body {
 
 /* Styles for the new unit button to make it square */
 .square-btn {
-  width: 100%;
+  width: 7vw;
   height: 7vw;
-  margin: clamp(10px, 5%, 5%);
-  padding: 0;
+  margin-top: 1vw;
   display: flex;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
 
