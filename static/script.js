@@ -322,7 +322,7 @@ document.getElementById('create-btn').addEventListener('click',function(){
     fetch("/createunit", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ unit: encodeURIComponent(unit) }) // Send the entire object
+        body: JSON.stringify({ unit: unit }) // Send the entire object
     })
     .then(response => {
         if (!response.ok) {
