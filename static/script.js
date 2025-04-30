@@ -170,7 +170,7 @@ document.getElementById("lp-classes").addEventListener("click",function (event) 
                 // clear the remaining units and add class specific units
                 document.getElementById('lp-units').innerHTML=``
                 for (const unit in data.units) {
-                    const unit_field = document.createElement('div');
+                    const unit_field = document.createElement('p');
                     unit_field.classList.add('unit-field')
                     unit_field.innerHTML = `${data.units[unit]}`
                     unit_field.setAttribute("data_id", `${unit}`)
@@ -239,6 +239,7 @@ document.getElementById("new-unit").addEventListener("click",function(){
 document.getElementById("lp-units").addEventListener("click",function (event) {
     if (event.target.tagName === "P") {
         const objectId = event.target.getAttribute("data_id");
+        console.log("unit ",objectId," pressed")
 
         // requesting all the info about the clicked unit
         fetch(`/getunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(objectId)}`)
