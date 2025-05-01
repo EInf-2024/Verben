@@ -2,15 +2,13 @@ from cmd import PROMPT
 
 from flask import Flask, request, jsonify, render_template, g
 from dotenv import load_dotenv
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 import json
 import os
 import openai
 import logging
 from pydantic import BaseModel
 from typing import List
-
-from openai import BaseModel
 
 import auth
 import traceback
@@ -588,8 +586,9 @@ def saveunit():
         return jsonify({"error": 1, "message": f"Interner Fehler beim Speichern der Unit: {str(e)}"}), 500
 
 #funktioniert nicht
-@auth.route(app, "/deleteunit", required_role=["teacher"], methods=['POST'])
+@auth.route(app, "/deleteunit", required_role=["teacher"], methods=['POST','GET'])
 def deleteunit():
+    print("Delete unit")
     unit_id = request.args.get('unit_id')
     print(unit_id)
 
