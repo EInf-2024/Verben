@@ -9,7 +9,6 @@ import openai
 import logging
 from pydantic import BaseModel
 from typing import List
-
 import auth
 import traceback
 
