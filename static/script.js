@@ -64,7 +64,7 @@ document.getElementById("login-button").addEventListener("click",function (){
     const password = document.getElementById('input-password').value
 
 
-    fetch("/login", {
+    fetch("login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username: encodeURIComponent(username), password: encodeURIComponent(password) })
@@ -110,7 +110,7 @@ function lpView(){
     document.getElementById('lp-units').classList.remove('d-none')
 
     // fetching the data needed to set up LP view
-    fetch(`/lpview?token=${encodeURIComponent(token)}`)
+    fetch(`lpview?token=${encodeURIComponent(token)}`)
         .then(response => response.json())
         .then(data => {
             document.getElementById('lp-user-btn').textContent = data.username
@@ -163,7 +163,7 @@ document.getElementById("lp-classes").addEventListener("click",function (event) 
         document.getElementById('lp-students').classList.remove('d-none')
 
         // get all the units and students of the selected class
-        fetch(`/lpclass?token=${encodeURIComponent(token)}&class_id=${encodeURIComponent(classId)}`)
+        fetch(`lpclass?token=${encodeURIComponent(token)}&class_id=${encodeURIComponent(classId)}`)
             .then(response => response.json())
             .then(data => {
 
@@ -203,7 +203,7 @@ document.getElementById("lp-students").addEventListener("click",function (event)
         document.getElementById('lp-units').classList.add('d-none')
 
         // requesting the info about the user
-        fetch(`/susview?token=${encodeURIComponent(studentId)}`)
+        fetch(`susview?token=${encodeURIComponent(studentId)}`)
             .then(response => response.json())
             .then(data => {
 
@@ -242,7 +242,7 @@ document.getElementById("lp-units").addEventListener("click",function (event) {
         console.log("unit ",objectId," pressed")
 
         // requesting all the info about the clicked unit
-        fetch(`/getunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(objectId)}`)
+        fetch(`getunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(objectId)}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('unit-name').value = data.unit_name
@@ -287,7 +287,7 @@ document.getElementById("home-btn").addEventListener("click", function (){
 document.getElementById('delete-btn').addEventListener('click',function(){
     const unit_id = document.getElementById('unit-name').getAttribute('data_id')
 
-    fetch(`/deleteunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(unit_id)}`)
+    fetch(`deleteunit?token=${encodeURIComponent(token)}&unit_id=${encodeURIComponent(unit_id)}`)
     .then(response => {
         if (!response.ok) {
             throw new Error(`Error: ${response.status} - ${response.statusText}`);
@@ -321,7 +321,7 @@ document.getElementById('create-btn').addEventListener('click',function(){
         'verbs': verbs,
     }
     // sending all the data to flask
-    fetch("/createunit", {
+    fetch("createunit", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ unit: unit }) // Send the entire object
@@ -359,7 +359,7 @@ document.getElementById('save-btn').addEventListener('click',function(){
     }
 
     // sending the data to flask
-    fetch("/saveunit", {
+    fetch("saveunit", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ unit: unit}) // Send the entire object
@@ -407,7 +407,7 @@ document.getElementById('add-btn').addEventListener('click', function() {
     formData.append("text", document.getElementById("verb-input").value);
 
     //  Send request (even if no files, but always with text)
-    fetch('/upload', {
+    fetch('upload', {
         method: 'POST',
         body: formData
     })
@@ -450,7 +450,7 @@ function susView (){
     document.getElementById('percentage').innerHTML=''
 
     // get all the info of a student
-    fetch(`/susview?token=${encodeURIComponent(token)}`)
+    fetch(`susview?token=${encodeURIComponent(token)}`)
         .then(response => response.json())
         .then(data => {
             document.getElementById("sus-left-panel").innerHTML = `<h2 class="sus-username-text">${data.username}</h2>`
@@ -498,7 +498,7 @@ document.getElementById("sus-right").addEventListener("click",function (event) {
         document.getElementById('navbar').setAttribute("selected_unit",`${objectId}`)
 
         // fetch data and set up the tenses to choose
-        fetch(`/tenses?token=${encodeURIComponent(token)}`)
+        fetch(`tenses?token=${encodeURIComponent(token)}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById("form-check-field").innerHTML=``
@@ -536,7 +536,7 @@ document.getElementById("start-training-button").addEventListener("click",functi
 
 
     // creates the sentences that are sent back by flask
-    fetch(`/training?token=${encodeURIComponent(token)}&tenses=${encodeURIComponent(selectedTenses.join(','))}&unit=${encodeURIComponent(selected_unit)}`)
+    fetch(`training?token=${encodeURIComponent(token)}&tenses=${encodeURIComponent(selectedTenses.join(','))}&unit=${encodeURIComponent(selected_unit)}`)
         .then(response => response.json())
         .then(data => {
             for (const sentence of data) {
@@ -632,7 +632,7 @@ document.getElementById("check-answers-button").addEventListener("click",functio
     //send back the score
     if(button_clicks === "0"){
         console.log(score)
-        fetch("/verify", {
+        fetch("verify", {
                 method: "POST",
                 headers: {
                 "Content-Type": "application/json"
